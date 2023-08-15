@@ -8,5 +8,9 @@ All you need to get started in your access token from Myenergi.
 
 To download July's usage, you would run this command:
 
-''' python fetch.py 2023 7 <token>
+``` 
+python fetch.py 2023 7 <token>
+```
+
+This will produce a CSV file for each device you have connected to your account.
 
