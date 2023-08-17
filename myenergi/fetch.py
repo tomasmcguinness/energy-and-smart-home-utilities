@@ -80,6 +80,9 @@ for device_data in devices_data:
 
     export_data = []
 
+    export = ["Year", "Month", "Day", "Boosted kWh", "Diverted kWh"]
+    export_data.append(export)
+
     current_dom = 1
     last_dom = 1
 
@@ -106,7 +109,7 @@ for device_data in devices_data:
                 daily_boosted_kWh += phase_1_boosted
 
                 if current_dom != _reading["dom"]:
-                    export = [current_dom, daily_boosted_kWh, daily_diverted_kWh]
+                    export = [year, month, current_dom, daily_boosted_kWh, daily_diverted_kWh]
                     export_data.append(export)
                     current_dom = _reading["dom"]
                     daily_boosted_kWh = 0
@@ -129,7 +132,7 @@ for device_data in devices_data:
                 daily_boosted_kWh += heater_1_boosted
 
                 if current_dom != _reading["dom"]:
-                    export = [current_dom, daily_boosted_kWh, daily_diverted_kWh]
+                    export = [year, month, current_dom, daily_boosted_kWh, daily_diverted_kWh]
                     export_data.append(export)
                     current_dom = _reading["dom"]
                     daily_boosted_kWh = 0
