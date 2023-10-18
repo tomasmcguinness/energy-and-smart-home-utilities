@@ -16,3 +16,8 @@ This will produce a CSV file for each device you have connected to your account.
 
 I've recorded a demo of the script - https://youtu.be/putHfwCZrLE
 
+# Sensors
+
+## Flow and Return Sensor 
+
+Using the boiler_flow_and_return_sensor.yaml to flash ESPHome.
