@@ -22,6 +22,10 @@ api:
   encryption: 
     key: !secret api_key
 
+ota:
+  safe_mode: true
+  password: !secret api_key
+
 sensor:
   - platform: ntc
     id: boiler_flow_temperature
@@ -35,7 +39,7 @@ sensor:
   - platform: resistance
     id: flow_resistance_sensor
     sensor: flow_source_sensor
-    configuration: DOWNSTREAM
+    configuration: UPSTREAM
     resistor: 10kOhm
     name: Flow Resistance Sensor
     internal: true
@@ -58,7 +62,7 @@ sensor:
   - platform: resistance
     id: return_resistance_sensor
     sensor: return_source_sensor
-    configuration: DOWNSTREAM
+    configuration: UPSTREAM
     resistor: 10kOhm
     name: Return Resistance Sensor
     internal: true
