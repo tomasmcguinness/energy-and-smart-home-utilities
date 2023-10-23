@@ -1,5 +1,5 @@
 esphome:
-  name: 'boiler-flow-and-return-sensor'
+  name: 'boiler-fart-sensor'
   platformio_options:
     board_build.flash_mode: dio
     board_build.mcu: esp32c3
@@ -32,6 +32,20 @@ sensor:
       reference_resistance: 10kOhm
     name: Flow Temperature
 
+  - platform: resistance
+    id: flow_resistance_sensor
+    sensor: flow_source_sensor
+    configuration: DOWNSTREAM
+    resistor: 10kOhm
+    name: Flow Resistance Sensor
+    internal: true
+
+  - platform: adc
+    id: flow_source_sensor
+    pin: 3
+    update_interval: 5s
+    attenuation: 11db
+
   - platform: ntc
     id: boiler_return_temperature
     sensor: return_resistance_sensor
@@ -40,14 +54,6 @@ sensor:
       reference_temperature: 25°C
       reference_resistance: 10kOhm
     name: Return Temperature
-    internal: true
-
-  - platform: resistance
-    id: flow_resistance_sensor
-    sensor: flow_source_sensor
-    configuration: DOWNSTREAM
-    resistor: 10kOhm
-    name: Flow Resistance Sensor
 
   - platform: resistance
     id: return_resistance_sensor
@@ -56,12 +62,6 @@ sensor:
     resistor: 10kOhm
     name: Return Resistance Sensor
     internal: true
-
-  - platform: adc
-    id: flow_source_sensor
-    pin: 3
-    update_interval: 5s
-    attenuation: 11db
 
   - platform: adc
     id: return_source_sensor
