@@ -35,12 +35,16 @@ sensor:
       reference_temperature: 25°C
       reference_resistance: 10kOhm
     name: Flow Temperature
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
 
   - platform: resistance
     id: flow_resistance_sensor
     sensor: flow_source_sensor
     configuration: UPSTREAM
-    resistor: 10kOhm
+    resistor: 9800Ohm
     name: Flow Resistance Sensor
     internal: true
 
@@ -58,12 +62,16 @@ sensor:
       reference_temperature: 25°C
       reference_resistance: 10kOhm
     name: Return Temperature
+    filters:
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
 
   - platform: resistance
     id: return_resistance_sensor
     sensor: return_source_sensor
     configuration: UPSTREAM
-    resistor: 10kOhm
+    resistor: 9800Ohm
     name: Return Resistance Sensor
     internal: true
 
