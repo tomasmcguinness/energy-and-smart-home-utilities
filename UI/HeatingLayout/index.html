@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style type="text/css">
+    .path-hot {
+        stroke-dasharray: 2;
+        animation: dash 160s linear reverse infinite;
+    }
+
+    .path-hot-reverse {
+        stroke-dasharray: 2;
+        animation: dash 160s linear infinite;
+    }
+
+    .path-cold {
+        stroke-dasharray: 2;
+        animation: dash 160s linear infinite;
+    }
+
+    .path-cold-reverse {
+        stroke-dasharray: 2;
+        animation: dash 160s linear reverse infinite;
+    }
+
+    @keyframes dash {
+        to {
+            stroke-dashoffset: 1000;
+        }
+    }
+</style>
+
+<head>
+
+</head>
+
+<body>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 420">
+
+        <defs>
+            <g id="radiator" class="cube-unit">
+                <defs>
+                    <pattern id="Pattern" x="0" y="0" width="5" height="26">
+                        <rect width="5" x="2" y="2" height="22" fill="gray" stroke="gray" stroke-width="0" />
+                    </pattern>
+                </defs>
+
+                <rect fill="url(#Pattern)" width="60" x="1" y="0" height="20" fill="white" stroke="black" stroke-width="1" />
+
+                <path class="path-hot-reverse" fill="none" stroke="red" stroke-width="1" d="m0,18 l0,7" />
+                <path class="path-cold-reverse" fill="none" stroke="blue" stroke-width="1" d="m62,18 l0,12" />
+            </g>
+
+            <g id="boiler" class="cube-unit">
+                <rect width="20" height="30" fill="white" stroke="black" stroke-width="1" />
+            </g>
+        </defs>
+        <use xlink:href="#boiler" x="10" y="10" />
+
+        <use xlink:href="#radiator" x="20" y="50" />
+        <use xlink:href="#radiator" x="90" y="50" />
+
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,40 L12,180" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,75 L150,75" />
+
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,40 L15,180" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,80 L150,80" />
+    </svg>
+</body>
+
+</html>
