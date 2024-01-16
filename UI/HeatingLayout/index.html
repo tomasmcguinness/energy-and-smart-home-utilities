@@ -34,37 +34,99 @@
 </head>
 
 <body>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 420">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 220">
 
         <defs>
             <g id="radiator" class="cube-unit">
-                <defs>
-                    <pattern id="Pattern" x="0" y="0" width="5" height="26">
-                        <rect width="5" x="2" y="2" height="22" fill="gray" stroke="gray" stroke-width="0" />
-                    </pattern>
-                </defs>
-
-                <rect fill="url(#Pattern)" width="60" x="1" y="0" height="20" fill="white" stroke="black" stroke-width="1" />
-
+                <rect width="30" x="1" y="1" height="20" fill="white" stroke="black" stroke-width="1" />
                 <path class="path-hot-reverse" fill="none" stroke="red" stroke-width="1" d="m0,18 l0,7" />
-                <path class="path-cold-reverse" fill="none" stroke="blue" stroke-width="1" d="m62,18 l0,12" />
+                <path class="path-cold-reverse" fill="none" stroke="blue" stroke-width="1" d="m32,18 l0,12" />
+            </g>
+
+            <g id="heat-meter" class="cube-unit">
+                <rect width="30" x="1" y="0" height="20" fill="white" stroke="black" stroke-width="1" />
+                <path class="path-hot-reverse" fill="none" stroke="red" stroke-width="1" d="m0,18 l0,7" />
+                <path class="path-cold-reverse" fill="none" stroke="blue" stroke-width="1" d="m32,18 l0,12" />
             </g>
 
             <g id="boiler" class="cube-unit">
                 <rect width="20" height="30" fill="white" stroke="black" stroke-width="1" />
             </g>
         </defs>
+
         <use xlink:href="#boiler" x="10" y="10" />
 
+        <text x="20" y="50" font-size="5">Bathroom</text>
         <use xlink:href="#radiator" x="20" y="50" />
+
+        <text x="90" y="50" font-size="5">Landing</text>
         <use xlink:href="#radiator" x="90" y="50" />
 
-        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,40 L12,180" />
-        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,75 L150,75" />
+        <text x="20" y="90" font-size="5">Sitting Room</text>
+        <use xlink:href="#radiator" x="20" y="90" />
+        <text x="60" y="90" font-size="5">Living Room</text>
+        <use xlink:href="#radiator" x="60" y="90" />
+        <text x="100" y="90" font-size="5">Kitchen</text>
+        <use xlink:href="#radiator" x="100" y="90" />
 
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,40 L15,180" />
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,80 L150,80" />
+        <text x="20" y="130" font-size="5">Office</text>
+        <use xlink:href="#radiator" x="20" y="130" />
+        <use xlink:href="#radiator" x="60" y="130" />
+        <use xlink:href="#radiator" x="100" y="130" />
+        <use xlink:href="#radiator" x="140" y="130" />
+
+        <use xlink:href="#radiator" x="20" y="170" />
+
+        <!-- From Boiler -->
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,40 L12,195" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,40 L15,200" />
+
+        <!-- Path 1 -->
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,75 L90,75" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,78 L122,78" />
+
+        <!-- Path 1 -->
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,115 L100,115" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,120 L132,120" />
+
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,155 L140,155" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,160 L172,160" />
+
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,195 L20,195" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,200 L52,200" />
     </svg>
+
+    <script type="text/javascript">
+        let ws = new WebSocket("ws://192.168.1.10:8123/api/websocket");
+        let id = 1;
+        ws.onmessage = (e) => {
+            console.log({ e });
+
+            const data = JSON.parse(e.data);
+            switch (data.type) {
+                case 'auth_required':
+                    ws.send(
+                        JSON.stringify({
+                            type: 'auth',
+                            access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJlNjVhNDNkNmEyYmY0MWYzODYyNmU2YmZiNTk4MjQxMCIsImlhdCI6MTY2OTIxOTc0NSwiZXhwIjoxOTg0NTc5NzQ1fQ.BPqTBu9iE0P762i3wvx7QiryAJ3UOXjzR_D9OGlyN5A',
+                        })
+                    );
+                    break;
+                case 'auth_ok':
+                    ws.send(
+                        JSON.stringify({
+                            id: id++,
+                            type: 'subscribe_events',
+                        })
+                    );
+                    break;
+                default:
+                    //alert(e.data);
+            }
+        };
+        ws.onopen = () => {
+        };            
+    </script>
 </body>
 
 </html>
