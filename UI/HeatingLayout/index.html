@@ -3,23 +3,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style type="text/css">
     .path-hot {
-        stroke-dasharray: 2;
-        animation: dash 160s linear reverse infinite;
+        /* stroke-dasharray: 2; */
+        /* animation: dash 160s linear reverse infinite; */
     }
 
     .path-hot-reverse {
-        stroke-dasharray: 2;
-        animation: dash 160s linear infinite;
+        /* stroke-dasharray: 2; */
+        /* animation: dash 160s linear infinite; */
     }
 
     .path-cold {
-        stroke-dasharray: 2;
-        animation: dash 160s linear infinite;
+        /* stroke-dasharray: 2; */
+        /* animation: dash 160s linear infinite; */
     }
 
     .path-cold-reverse {
-        stroke-dasharray: 2;
-        animation: dash 160s linear reverse infinite;
+        /* stroke-dasharray: 2; */
+        /* animation: dash 160s linear reverse infinite; */
     }
 
     @keyframes dash {
@@ -27,6 +27,9 @@
             stroke-dashoffset: 1000;
         }
     }
+
+    html, body { margin:0; padding:0; overflow:hidden }
+    svg { position:fixed; top:0; left:0; height:1024px; width:1024px; }
 </style>
 
 <head>
@@ -34,13 +37,13 @@
 </head>
 
 <body>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 220">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 250">
 
         <defs>
             <g id="radiator" class="cube-unit">
                 <rect width="30" x="1" y="1" height="20" fill="white" stroke="black" stroke-width="1" />
                 <path class="path-hot-reverse" fill="none" stroke="red" stroke-width="1" d="m0,18 l0,7" />
-                <path class="path-cold-reverse" fill="none" stroke="blue" stroke-width="1" d="m32,18 l0,12" />
+                <path class="path-cold-reverse" fill="none" stroke="blue" stroke-width="1" d="m32,18 l0,9" />
             </g>
 
             <g id="heat-meter" class="cube-unit">
@@ -56,7 +59,7 @@
 
         <use xlink:href="#boiler" x="10" y="10" />
 
-        <text x="20" y="50" font-size="5">Bathroom</text>
+        <!-- <text x="20" y="50" font-size="5">Bathroom</text>
         <use xlink:href="#radiator" x="20" y="50" />
 
         <text x="90" y="50" font-size="5">Landing</text>
@@ -74,58 +77,65 @@
         <use xlink:href="#radiator" x="60" y="130" />
         <use xlink:href="#radiator" x="100" y="130" />
         <use xlink:href="#radiator" x="140" y="130" />
-
-        <use xlink:href="#radiator" x="20" y="170" />
+-->
 
         <!-- From Boiler -->
-        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,40 L12,195" />
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,40 L15,200" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="2" d="M12,40.5 L12,195" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="2" d="M15,40.5 L15,200" />
 
-        <!-- Path 1 -->
-        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,75 L90,75" />
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,78 L122,78" />
+        <text x="25" y="50" font-size="5">Hallway</text>
+        
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,75 25.5,75" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,76.5 L57.5,76.5" />
 
-        <!-- Path 1 -->
-        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,115 L100,115" />
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,120 L132,120" />
+        <use xlink:href="#radiator" x="25" y="50" /> 
+        <text x="28" y="60" font-size="3">1200mm</text>
+        
+        <text x="70" y="30" font-size="5">Landing</text>
+        <use xlink:href="#radiator" x="70" y="30" /> 
 
+        <text x="75" y="65" font-size="5">Bathroom</text>
+        <use xlink:href="#radiator" x="75" y="65" /> 
+
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M72,128 72,56.5" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M71.5,56.5 102,56.5" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M70,125 L70,55" />
+
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M71.5,91.5 107,91.5" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M70,90 L75.5,90" />
+        
+        <path class="path-hot" fill="none" stroke="red" stroke-width="2" d="M12,125 L132,125" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="2" d="M15,128 L132,128" />
+
+        <text x="85" y="100" font-size="5">Office</text>
+        <use xlink:href="#radiator" x="85" y="100" /> 
+
+        <text x="172" y="100" font-size="5">Front Bedroom</text>
+        <use xlink:href="#radiator" x="172" y="100" /> 
+
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M132,124.5 L172,124.5" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,127.5 L204.5,127.5" />
+
+        <text x="126.6" y="25" font-size="5">Master Bedroom</text>
+        <use xlink:href="#radiator" x="126.5" y="25" /> 
+
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="2" d="M130,127.5 L130,52" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M130,52.5 L159,52.5" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="2" d="M127,125 L127,50" />
+
+        <!--
+        
         <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,155 L140,155" />
         <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,160 L172,160" />
 
         <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,195 L20,195" />
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,200 L52,200" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,200 L52,200" /> --> -->
     </svg>
 
     <script type="text/javascript">
-        let ws = new WebSocket("ws://192.168.1.10:8123/api/websocket");
-        let id = 1;
-        ws.onmessage = (e) => {
-            console.log({ e });
-
-            const data = JSON.parse(e.data);
-            switch (data.type) {
-                case 'auth_required':
-                    ws.send(
-                        JSON.stringify({
-                            type: 'auth',
-                            access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJlNjVhNDNkNmEyYmY0MWYzODYyNmU2YmZiNTk4MjQxMCIsImlhdCI6MTY2OTIxOTc0NSwiZXhwIjoxOTg0NTc5NzQ1fQ.BPqTBu9iE0P762i3wvx7QiryAJ3UOXjzR_D9OGlyN5A',
-                        })
-                    );
-                    break;
-                case 'auth_ok':
-                    ws.send(
-                        JSON.stringify({
-                            id: id++,
-                            type: 'subscribe_events',
-                        })
-                    );
-                    break;
-                default:
-                    //alert(e.data);
-            }
-        };
-        ws.onopen = () => {
-        };            
+        function pipelength(e) {
+            console.log(e);
+        }
     </script>
 </body>
 
