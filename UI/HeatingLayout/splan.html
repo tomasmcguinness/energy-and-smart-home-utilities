@@ -77,7 +77,7 @@
 
         <use xlink:href="#boiler" x="10" y="10" />
 
-        <text id="boiler-temperature-label" x="13" y="35" font-size="12">70</text>
+        <text id="boiler-temperature-label" x="13" y="35" font-size="12">-</text>
 
         <path class="common-pipe" fill="none" stroke="red" stroke-width="2" d="M12,40.5 L12,62" />
         <path class="common-pipe reverse" fill="none" stroke="blue" stroke-width="2" d="M18,40.5 L18,83" />
@@ -107,9 +107,21 @@
         let isHeatingOn = false;
         let isHotWaterOn = false;
 
-        function toggleHotWaterValve() {
-            document.getElementById("boiler-temperature-label").text = "40";
+        function updateBoilerWaterTemperature() {
+            let temp = 0;
 
+            if(isHotWaterOn) {
+                temp = "70";
+            } else if(isHeatingOn) {
+                temp = "40";
+            } 
+
+            var textNode = document.getElementById("boiler-temperature-label").childNodes[0];
+            textNode.nodeValue = temp;
+        }
+
+        function toggleHotWaterValve() {
+            
             if(isHotWaterOn) {
                 removeClass(document.getElementsByClassName("common-pipe"), "hot-water-flowing");
                 removeClass(document.getElementsByClassName("hot-water-pipe"), "hot-water-flowing");
@@ -119,10 +131,11 @@
             }
 
             isHotWaterOn = !isHotWaterOn;
+
+            updateBoilerWaterTemperature();
         }
 
         function toggleHeatingValve() {
-            document.getElementById("boiler-temperature-label").text = "40";
 
             if(isHeatingOn) {
                 removeClass(document.getElementsByClassName("common-pipe"), "hot-water-flowing");
@@ -133,6 +146,8 @@
             }
 
             isHeatingOn = !isHeatingOn;
+
+            updateBoilerWaterTemperature();
         }
 
         function addClass(elements, className) {
