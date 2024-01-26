@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
 <style type="text/css">
     .path-hot {
         /* stroke-dasharray: 2; */
@@ -28,7 +28,7 @@
         }
     }
 
-    html, body { margin:0; padding:0; overflow:hidden }
+    html, body { margin:0; padding:0; overflow:y }
     svg { position:fixed; top:0; left:0; height:1024px; width:1024px; }
 </style>
 
@@ -120,10 +120,8 @@
         <text x="140" y="155" font-size="5">Kitchen</text>
         <use xlink:href="#radiator" x="140" y="155" /> 
 
-        
-
     </svg>
-
+    <script src="<https://unpkg.com/mqtt/dist/mqtt.min.js>"></script>
     <script type="text/javascript">
         function pipelength(e) {
             console.log(e);
