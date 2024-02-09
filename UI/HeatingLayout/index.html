@@ -121,11 +121,55 @@
         <use xlink:href="#radiator" x="140" y="155" /> 
 
     </svg>
-    <script src="<https://unpkg.com/mqtt/dist/mqtt.min.js>"></script>
+    <script src="secrets.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
     <script type="text/javascript">
         function pipelength(e) {
             console.log(e);
         }
+
+        var client = new Paho.MQTT.Client("192.168.1.10", 9001, "clientId");
+
+        client.connect({ onSuccess:onConnect, userName: secret_mqtt_username, password: secret_mqtt_password });
+
+
+// called when the client connects
+function onConnect() {
+  // Once a connection has been made, make a subscription and send a message.
+  console.log("onConnect");
+  client.subscribe("World");
+  message = new Paho.MQTT.Message("Hello");
+  message.destinationName = "World";
+  client.send(message);
+}
+//         const url = secret_mqtt_url;
+
+// const options = {
+//   clean: true,
+//   connectTimeout: 4000,
+//   username: secret_mqtt_username,
+//   password: secret_mqtt_password,
+// }
+
+// const client  = mqtt.connect(url, options)
+// client.on('connect', function () {
+//   console.log('Connected')
+//   // Subscribe to a topic
+//   client.subscribe('radiators/*', function (err) {
+//     if (!err) {
+//       // Publish a message to a topic
+//       client.publish('test', 'Hello mqtt')
+//     }
+//   })
+// })
+
+// // Receive messages
+// client.on('message', function (topic, message) {
+//   // message is Buffer
+//   console.log(message.toString())
+//   client.end()
+// })
+
     </script>
 </body>
 
