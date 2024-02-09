@@ -2,6 +2,22 @@
 <html>
 <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
 <style type="text/css">
+    body {
+        position: absolute;
+        font-size: larger;
+    }
+
+    body button {
+        font-size: large;
+    }
+
+    #calls {
+        position: relative;
+        top: 50px;
+        left: 200px;
+        z-index: 10;
+    }
+
     .hot-water-flowing {
         stroke-dasharray: 2;
         animation-duration: 160s;
@@ -43,12 +59,18 @@
     svg { position:fixed; top:0; left:0; height:1024px; width:1024px; }
 </style>
 
-<head>
-
-</head>
-
 <body>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 250">
+    <div id="calls">
+        <table>
+            <tr>
+                <td><button id="heatingButton" onclick="toggleHeatingValve()">Start Calling For Heat</button></td>
+            </tr>
+            <tr>
+                <td><button id="hotWaterButton" onclick="toggleHotWaterValve()">Start Calling For Hot Water</button></td>
+            </tr>
+        </table>
+    </div>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" style="z-index: 1;">
 
         <defs>
             <g id="radiator" class="cube-unit">
@@ -100,6 +122,10 @@
         <use xlink:href="#radiator" x="80" y="155" /> 
         <use xlink:href="#radiator" x="140" y="155" /> 
 
+        <text class="radiator-temperature-label" x="35" y="170" font-size="12">-</text>
+        <text class="radiator-temperature-label" x="90" y="170" font-size="12">-</text>
+        <text class="radiator-temperature-label" x="150" y="170" font-size="12">-</text>
+
     </svg>
     <script src="<https://unpkg.com/mqtt/dist/mqtt.min.js>"></script>
     <script type="text/javascript">
@@ -108,7 +134,7 @@
         let isHotWaterOn = false;
 
         function updateBoilerWaterTemperature() {
-            let temp = 0;
+            let temp = "";
 
             if(isHotWaterOn) {
                 temp = "70";
@@ -118,6 +144,14 @@
 
             var textNode = document.getElementById("boiler-temperature-label").childNodes[0];
             textNode.nodeValue = temp;
+
+            for (const label of document.getElementsByClassName("radiator-temperature-label")) {
+                var node = label.childNodes[0];
+                node.nodeValue = temp;
+            }
+
+            document.getElementById("hotWaterButton").innerText = isHotWaterOn ? "Stop Calling For Hot Water" : "Start Calling For Hot Water";
+            document.getElementById("heatingButton").innerText = isHeatingOn ? "Stop Calling For Heat" : "Start Calling For Heat";
         }
 
         function toggleHotWaterValve() {
