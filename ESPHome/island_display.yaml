@@ -1,0 +1,82 @@
+esphome:
+  name: island-display
+  friendly_name: Island Display
+
+esp32:
+  board: esp32s3box
+  framework:
+    type: arduino
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+api:
+  encryption: 
+    key: !secret api_key
+
+ota:
+  safe_mode: true
+  password: !secret api_key
+
+external_components:
+  - source: github://pr#6008
+    components: [ tt21100 ]
+
+i2c:
+  scl: GPIO18
+  sda: GPIO8
+  scan: true
+
+display:
+  - platform: ili9xxx
+    model: s3box
+    cs_pin: GPIO5
+    dc_pin: GPIO4
+    reset_pin: GPIO48
+    id: lcd
+    auto_clear_enabled: false
+    # Width = 320, Height = 240
+    lambda: |-
+      auto bg = Color(250, 250, 250);
+      auto text = Color(250, 250, 250);
+      auto border_color = Color(60, 60, 60);
+      auto button_bg_on = Color(36, 180, 245);
+      auto button_bg_off = Color(158, 158, 158);
+      auto red = Color(255, 0, 0);
+      auto green = Color(0, 255, 0);
+      auto blue = Color(0, 0, 255);
+      it.image(0,0, id(background_image), ImageAlign::TOP_LEFT);
+      it.strftime(160, 65, id(font_large), text, TextAlign::CENTER, "%I:%M", id(time_ha).now());
+      it.strftime(160, 115, id(font_medium), text, TextAlign::CENTER, "%a, %b %e", id(time_ha).now());
+      int circleY = 187;
+      int circleX1 = 53, circleX2 = 160, circleX3 = 267;
+      int circleRadius = 40;
+      
+      it.filled_circle(circleX1, circleY, circleRadius+2, text);
+      it.filled_circle(circleX2, circleY, circleRadius+2, text);
+      it.filled_circle(circleX3, circleY, circleRadius+2, text);
+      if (id(basement_lights).state){
+        it.filled_circle(circleX1, circleY, circleRadius, button_bg_on);
+        it.image(circleX1, circleY, id(ceiling_light_icon), ImageAlign::CENTER);
+      }
+      else{
+        it.filled_circle(circleX1, circleY, circleRadius, button_bg_off);
+        it.image(circleX1, circleY, id(ceiling_light_icon_off), ImageAlign::CENTER);
+      }
+      if (id(basement_lamps).state){
+        it.filled_circle(circleX2, circleY, circleRadius, button_bg_on);
+        it.image(circleX2, circleY, id(floor_lamp_icon), ImageAlign::CENTER);
+      }
+      else{
+        it.filled_circle(circleX2, circleY, circleRadius, button_bg_off);
+        it.image(circleX2, circleY, id(floor_lamp_icon_off), ImageAlign::CENTER);
+      }
+      if (id(office_lights).state){
+        it.filled_circle(circleX3, circleY, circleRadius, button_bg_on);
+        it.image(circleX3, circleY, id(office_icon), ImageAlign::CENTER);
+      }
+      else{
+        it.filled_circle(circleX3, circleY, circleRadius, button_bg_off);
+        it.image(circleX3, circleY, id(office_icon), ImageAlign::CENTER);
+      }
