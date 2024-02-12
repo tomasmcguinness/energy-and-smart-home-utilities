@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+<style type="text/css">
+    .path-hot {
+        /* stroke-dasharray: 2; */
+        /* animation: dash 160s linear reverse infinite; */
+    }
+
+    .path-hot-reverse {
+        /* stroke-dasharray: 2; */
+        /* animation: dash 160s linear infinite; */
+    }
+
+    .path-cold {
+        /* stroke-dasharray: 2; */
+        /* animation: dash 160s linear infinite; */
+    }
+
+    .path-cold-reverse {
+        /* stroke-dasharray: 2; */
+        /* animation: dash 160s linear reverse infinite; */
+    }
+
+    @keyframes dash {
+        to {
+            stroke-dashoffset: 1000;
+        }
+    }
+
+    html, body { margin:0; padding:0; overflow:y }
+    svg { position:fixed; top:0; left:0; height:1024px; width:1024px; }
+</style>
+
+<head>
+
+</head>
+
+<body>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 250">
+
+        <defs>
+            <g id="radiator" class="cube-unit">
+                <rect width="30" x="1" y="1" height="20" fill="white" stroke="black" stroke-width="1" />
+                <path class="path-hot-reverse" fill="none" stroke="red" stroke-width="1" d="m0,18 l0,7" />
+                <path class="path-cold-reverse" fill="none" stroke="blue" stroke-width="1" d="m32,18 l0,9" />
+            </g>
+
+            <g id="heat-meter" class="cube-unit">
+                <rect width="30" x="1" y="0" height="20" fill="white" stroke="black" stroke-width="1" />
+                <path class="path-hot-reverse" fill="none" stroke="red" stroke-width="1" d="m0,18 l0,7" />
+                <path class="path-cold-reverse" fill="none" stroke="blue" stroke-width="1" d="m32,18 l0,12" />
+            </g>
+
+            <g id="boiler" class="cube-unit">
+                <rect width="20" height="30" fill="white" stroke="black" stroke-width="1" />
+            </g>
+        </defs>
+
+        <use xlink:href="#boiler" x="10" y="10" />
+
+        <path class="path-hot" fill="none" stroke="red" stroke-width="2" d="M12,40.5 L12,225.5" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="2" d="M15,40.5 L15,227" />
+
+        <text x="25" y="200" font-size="5">Hallway</text>
+        <use xlink:href="#radiator" x="25" y="200" /> 
+        
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,225 25.5,225" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,226.5 L57.5,226.5" />
+
+        <text x="50" y="30" font-size="5">Landing</text>
+        <use xlink:href="#radiator" x="50" y="30" /> 
+
+        <text x="55" y="65" font-size="5">Bathroom</text>
+        <use xlink:href="#radiator" x="55" y="65" /> 
+
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M52,128 L52,56.5" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M51.5,56.5 L82,56.5" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M50,125 L50,55" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M51.5,91.5 87,91.5" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M50,90 L55.5,90" />
+
+        <text x="85" y="100" font-size="5">Office</text>
+        <use xlink:href="#radiator" x="85" y="100" /> 
+
+        <text x="172" y="100" font-size="5">Front Bedroom</text>
+        <use xlink:href="#radiator" x="172" y="100" /> 
+
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M132,124.5 L172,124.5" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,127.5 L204.5,127.5" />
+
+        <text x="126.6" y="25" font-size="5">Master Bedroom</text>
+        <use xlink:href="#radiator" x="126.5" y="25" /> 
+
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="2" d="M130,127.5 L130,52" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M130,52.5 L159,52.5" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="2" d="M127,125 L127,50" />
+
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M126.5,90.5 L137,90.5" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M127.5,92 L169,92" />
+
+        <text x="136.6" y="65" font-size="5">Back Bedroom</text>
+        <use xlink:href="#radiator" x="136.5" y="65" /> 
+
+        <path class="path-hot" fill="none" stroke="red" stroke-width="2" d="M12,125 L132,125" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="2" d="M15,128 L132,128" />
+
+        <path class="path-hot" fill="none" stroke="red" stroke-width="2" d="M12,180 L125,180" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="2" d="M15,183 L125,183" />
+
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M125,179.5 L140.5,179.5" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M125,182.5 L172.5,182.5" />
+
+        <text x="25" y="155" font-size="5">Sitting Room</text>
+        <use xlink:href="#radiator" x="25" y="155" /> 
+
+        <text x="72" y="155" font-size="5">Living Room</text>
+        <use xlink:href="#radiator" x="72" y="155" /> 
+
+        <text x="140" y="155" font-size="5">Kitchen</text>
+        <use xlink:href="#radiator" x="140" y="155" /> 
+
+    </svg>
+    <script src="secrets.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        function pipelength(e) {
+            console.log(e);
+        }
+
+        var client = new Paho.MQTT.Client("192.168.1.10", 9001, "clientId");
+
+        client.connect({ onSuccess:onConnect, userName: secret_mqtt_username, password: secret_mqtt_password });
+
+
+// called when the client connects
+function onConnect() {
+  // Once a connection has been made, make a subscription and send a message.
+  console.log("onConnect");
+  client.subscribe("World");
+  message = new Paho.MQTT.Message("Hello");
+  message.destinationName = "World";
+  client.send(message);
+}
+//         const url = secret_mqtt_url;
+
+// const options = {
+//   clean: true,
+//   connectTimeout: 4000,
+//   username: secret_mqtt_username,
+//   password: secret_mqtt_password,
+// }
+
+// const client  = mqtt.connect(url, options)
+// client.on('connect', function () {
+//   console.log('Connected')
+//   // Subscribe to a topic
+//   client.subscribe('radiators/*', function (err) {
+//     if (!err) {
+//       // Publish a message to a topic
+//       client.publish('test', 'Hello mqtt')
+//     }
+//   })
+// })
+
+// // Receive messages
+// client.on('message', function (topic, message) {
+//   // message is Buffer
+//   console.log(message.toString())
+//   client.end()
+// })
+
+    </script>
+</body>
+
+</html>
