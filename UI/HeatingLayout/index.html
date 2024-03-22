@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style type="text/css">
     .path-hot {
         /* stroke-dasharray: 2; */
@@ -29,7 +29,7 @@
     }
 
     html, body { margin:0; padding:0; overflow:y }
-    svg { position:fixed; top:0; left:0; height:1024px; width:1024px; }
+    svg { position:fixed; top:0; left:0; height:1080px; width:1024px; }
 </style>
 
 <head>
@@ -37,13 +37,14 @@
 </head>
 
 <body>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 250">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 310">
 
         <defs>
             <g id="radiator" class="cube-unit">
                 <rect width="30" x="1" y="1" height="20" fill="white" stroke="black" stroke-width="1" />
                 <path class="path-hot-reverse" fill="none" stroke="red" stroke-width="1" d="m0,18 l0,7" />
                 <path class="path-cold-reverse" fill="none" stroke="blue" stroke-width="1" d="m32,18 l0,9" />
+                <text x="10" y="14" font-size="5">700W</text>
             </g>
 
             <g id="heat-meter" class="cube-unit">
@@ -93,12 +94,12 @@
         <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M132,104.5 L172,104.5" />
         <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,107.5 L204.5,107.5" />
 
-        <text x="126.6" y="10" font-size="5">MASTER BEDROOM</text>
-        <use xlink:href="#radiator" x="126.5" y="10" /> 
+        <text x="127.6" y="10" font-size="5">MASTER BEDROOM</text>
+        <use xlink:href="#radiator" x="127" y="10" /> 
 
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="2" d="M130,107.5 L130,32" />
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M130,32.5 L159,32.5" />
-        <path class="path-hot" fill="none" stroke="red" stroke-width="2" d="M127,105 L127,35" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M130,107.5 L130,36.1" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M130,36.6 L159,36.5" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M127,105 L127,35" />
 
         <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M126.5,90.5 L137,90.5" />
         <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M127.5,92 L169,92" />
@@ -124,57 +125,8 @@
         <text x="140" y="120" font-size="5">KITCHEN</text>
         <use xlink:href="#radiator" x="140" y="120" /> 
 
+        
+
     </svg>
-    <script src="secrets.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
-    <script type="text/javascript">
-        function pipelength(e) {
-            console.log(e);
-        }
-
-        var client = new Paho.MQTT.Client("192.168.1.10", 9001, "clientId");
-
-        client.connect({ onSuccess:onConnect, userName: secret_mqtt_username, password: secret_mqtt_password });
-
-
-// called when the client connects
-function onConnect() {
-  // Once a connection has been made, make a subscription and send a message.
-  console.log("onConnect");
-  client.subscribe("World");
-  message = new Paho.MQTT.Message("Hello");
-  message.destinationName = "World";
-  client.send(message);
-}
-//         const url = secret_mqtt_url;
-
-// const options = {
-//   clean: true,
-//   connectTimeout: 4000,
-//   username: secret_mqtt_username,
-//   password: secret_mqtt_password,
-// }
-
-// const client  = mqtt.connect(url, options)
-// client.on('connect', function () {
-//   console.log('Connected')
-//   // Subscribe to a topic
-//   client.subscribe('radiators/*', function (err) {
-//     if (!err) {
-//       // Publish a message to a topic
-//       client.publish('test', 'Hello mqtt')
-//     }
-//   })
-// })
-
-// // Receive messages
-// client.on('message', function (topic, message) {
-//   // message is Buffer
-//   console.log(message.toString())
-//   client.end()
-// })
-
-    </script>
 </body>
-
 </html>
