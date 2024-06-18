@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+<style type="text/css">
+    body {
+        position: absolute;
+        font-size: larger;
+    }
+
+    body button {
+        font-size: large;
+    }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: y
+    }
+
+    svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 1080px;
+        width: 1920px;
+        z-index: 1;
+    }
+</style>
+
+<body>
+    <div id="app">
+        {{ message }}
+        <energyflow-component></energyflow-component>
+        <energyflow-component></energyflow-component>
+        <energyflow-component></energyflow-component>
+        <energyflow-component></energyflow-component>
+    </div>
+    <canvas id="canvas4" width="500"></canvas>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+
+        <defs>
+
+            <g id="meter" class="cube-unit">
+                <rect width="150" height="150" x="1" y="1" fill="white" stroke="black" stroke-width="5" />
+                <text x="40" y="35" font-size="25">GRID</text>
+            </g>
+
+            <g id="inverter" class="cube-unit">
+                <rect width="150" height="150" x="1" y="1" fill="white" stroke="black" stroke-width="5" />
+                <text x="25" y="25">INVERTER</text>
+            </g>
+
+            <g id="consumer-unit" class="cube-unit">
+                <rect width="350" height="200" x="10" y="0" fill="white" stroke="black" stroke-width="5"
+                    style="cursor: pointer;" />
+                <!-- <rect width="470" height="100" x="30" y="50" fill="grey" stroke="black" stroke-width="2"
+                    style="cursor: pointer;" /> -->
+            </g>
+
+        </defs>
+
+        <use xlink:href="#meter" x="50" y="50" />
+        <use xlink:href="#consumer-unit" x="375" y="50" />
+        <use xlink:href="#inverter" x="900" y="50" />
+
+    </svg>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="clamps.js"></script>
+    <script type="text/javascript">
+        const { createApp, ref } = Vue;
+
+        var app = createApp({
+            setup() {
+                const message = ref('Hello vue!')
+                return {
+                    message
+                }
+            }
+        });
+
+        app.component('energyflow-component', {
+            data() {
+                return {
+                    pixelsPerSecond: 20,
+                    fadeLength: 20,
+                    lineWidth: 5,
+                    prevTimestamp: undefined,
+                    offset: 0,
+                    chevronSpace: 12,
+                    chevronAngle: 0.7 * Math.PI,
+                    chevronLength: 20
+                }
+            },
+            props: ["direction", "energy"],
+            template:
+                `<canvas ref="canvas" width="200" height="50"></canvas>`,
+            methods: {
+                render(timestamp) {
+                    const delta = this.prevTimestamp ? timestamp - this.prevTimestamp : 0;
+                    this.prevTimestamp = timestamp;
+
+                    const n = Math.floor(this.length / this.chevronSpace);
+
+                    const offsetX = this.offset * Math.cos(this.angle);
+                    const offsetY = this.offset * Math.sin(this.angle);
+
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                    this.ctx.lineWidth = this.lineWidth;
+
+                    for (let i = 0; i < n; i++) {
+                        const x = this.x0 + (this.x1 - this.x0) * i / n + offsetX;
+                        const y = this.y0 + (this.y1 - this.y0) * i / n + offsetY;
+                        // The opacity depends on how close we are to the start (0) or end
+                        // (n * chevronSpace) of the line
+                        const dist = Math.min(i * this.chevronSpace + this.offset, n * this.chevronSpace - (i * this.chevronSpace + this.offset));
+                        const opacity = Math.min(1, dist / this.fadeLength);
+                        this.ctx.strokeStyle = 'rgba(200, 0, 0, ' + opacity + ')';
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(x + this.startX, y + this.startY);
+                        this.ctx.lineTo(x, y);
+                        this.ctx.lineTo(x + this.endX, y + this.endY);
+                        this.ctx.stroke();
+                    }
+
+                    this.offset += this.pixelsPerSecond * delta / 1000;
+
+                    if (this.offset >= this.chevronSpace) {
+                        this.offset %= this.chevronSpace;
+                    }
+
+                    window.requestAnimationFrame(this.render);
+                }
+            },
+            mounted() {
+                this.canvas = this.$refs.canvas;
+                this.ctx = this.canvas.getContext("2d");
+
+                this.y0 = 25;
+                this.y1 = 25;
+
+                this.x0 = 1;
+                this.x1 = 200;
+
+                // Angle between our line and the x-axis in radians
+                this.angle = Math.atan2(this.y1 - this.y0, this.x1 - this.x0);
+
+                // Length of our line (Euclidean distance)
+                this.length = Math.sqrt((this.x0 - this.x1) * (this.x0 - this.x1) + (this.y0 - this.y1) * (this.y0 - this.y1));
+
+                // Offset of the first point of a chevron relative to its center point
+                // calculated by subtracting the chevron angle from the line angle
+                this.startX = Math.cos(this.angle - this.chevronAngle) * this.chevronLength;
+                this.startY = Math.sin(this.angle - this.chevronAngle) * this.chevronLength;
+
+                // Offset of the third point of a chevron relative to its center point
+                // calculated by adding the chevron angle to the line angle
+                this.endX = Math.cos(this.angle + this.chevronAngle) * this.chevronLength;
+                this.endY = Math.sin(this.angle + this.chevronAngle) * this.chevronLength;
+
+                window.requestAnimationFrame(this.render);
+            }
+        });
+
+        app.mount('#app')
+    </script>
+</body>
+
+</html>
