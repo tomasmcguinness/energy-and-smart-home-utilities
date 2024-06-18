@@ -65,6 +65,11 @@
                     <text x="10" y="35" font-size="25">INVERTER</text>
                 </g>
 
+                <g id="battery" class="cube-unit">
+                    <rect width="150" height="300" x="1" y="1" fill="white" stroke="black" stroke-width="5" />
+                    <text x="10" y="35" font-size="25">BATTERY</text>
+                </g>
+
                 <g id="consumer-unit" class="cube-unit">
                     <rect width="350" height="200" x="1" y="1" fill="white" stroke="black" stroke-width="5"
                         style="cursor: pointer;" />
@@ -74,9 +79,17 @@
             </defs>
 
             <use xlink:href="#meter" x="50" y="50" />
+            <line x1="200" y1="150" x2="375" y2="150" style="stroke:black;stroke-width:5" />
             <use xlink:href="#consumer-unit" x="375" y="50" />
             <use v-if="showInverter" xlink:href="#inverter" x="925" y="50" />
+            <line v-if="showInverter"x1="725" y1="150" x2="925" y2="150" style="stroke:black;stroke-width:5" />
+            <line v-if="showInverter"x1="1075" y1="150" x2="1200" y2="150" style="stroke:black;stroke-width:2" />
+            <use v-if="showBattery" xlink:href="#battery" x="925" y="350" />
             <use v-if="showInverter" xlink:href="#solar-panel" x="1200" y="50" />
+
+            
+            
+            <line v-if="showInverter" x1="200" y1="150" x2="375" y2="150" style="stroke:black;stroke-width:5" />
 
         </svg>
 
@@ -106,6 +119,7 @@
             data() {
                 return {
                     showInverter: false,
+                    showBattery: true,
                     showSun: false,
                     isHouseTurnedOn: false,
                     housePowerConsumption: 500,
