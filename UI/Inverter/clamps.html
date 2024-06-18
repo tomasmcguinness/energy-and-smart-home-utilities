@@ -37,6 +37,8 @@
                 positive-direction="left"></energyflow-component>
             <energyflow-component top="100" left="740" :power="solarSystemPower" width="160"
                 positive-direction="right"></energyflow-component>
+                <energyflow-component top="100" left="1080" :power="pvPower" width="100"
+                positive-direction="right"></energyflow-component>
         </div>
 
         <div style="position: absolute; top: 400px; left: 400px; z-index: 10;">
@@ -75,9 +77,6 @@
             <use xlink:href="#consumer-unit" x="375" y="50" />
             <use v-if="showInverter" xlink:href="#inverter" x="925" y="50" />
             <use v-if="showInverter" xlink:href="#solar-panel" x="1200" y="50" />
-            <use v-if="showInverter" xlink:href="#solar-panel" x="1280" y="50" />
-            <use v-if="showInverter" xlink:href="#solar-panel" x="1200" y="180" />
-            <use v-if="showInverter" xlink:href="#solar-panel" x="1280" y="180" />
 
         </svg>
 
@@ -86,6 +85,7 @@
             <label for="toggleInverter">Inverter</label>
         </div>
 
+        <img src="sun.jpg" style="position: absolute; top: 20px; left: 1300px; width: 100px;">
     </div>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
