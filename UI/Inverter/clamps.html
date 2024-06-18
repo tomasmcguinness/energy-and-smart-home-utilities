@@ -37,7 +37,7 @@
                 positive-direction="left"></energyflow-component>
             <energyflow-component top="100" left="740" :power="solarSystemPower" width="160"
                 positive-direction="right"></energyflow-component>
-                <energyflow-component top="100" left="1080" :power="pvPower" width="100"
+            <energyflow-component top="100" left="1080" :power="pvPower" width="100"
                 positive-direction="right"></energyflow-component>
         </div>
 
@@ -88,7 +88,8 @@
             <input type="range" step="1" max="100" min="0" v-model="cloudCover" />
         </div>
         <img src="sun.jpg" v-if="showSun" style="position: absolute; top: 20px; left: 1300px; width: 100px;">
-        <img src="cloud.png" v-if="showSun" style="position: absolute; top: 30px; width: 100px;" :style="{'left': (parseInt(this.cloudCover) + 1300) + 'px'}">
+        <img src="cloud.png" v-if="showSun" style="position: absolute; top: 30px; width: 100px;"
+            :style="{'left': (parseInt(this.cloudCover) + 1300) + 'px'}">
     </div>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -104,10 +105,10 @@
             },
             data() {
                 return {
-                    showInverter: true,
-                    showSun: true,
+                    showInverter: false,
+                    showSun: false,
                     isHouseTurnedOn: false,
-                    housePowerConsumption: 1000,
+                    housePowerConsumption: 500,
                     gridPower: 0,
                     pvPower: 0,
                     solarSystemPower: 0,
@@ -116,7 +117,7 @@
             },
             watch: {
                 showInverter(newValue) {
-                    if(!newValue) {
+                    if (!newValue) {
                         this.showSun = false;
                     }
                 }
@@ -127,7 +128,7 @@
                 },
                 calculatePowerFlow() {
 
-                    if(this.showSun) {
+                    if (this.showSun) {
                         this.pvPower = 10 * parseInt(this.cloudCover);
                     } else {
                         this.pvPower = 0;
@@ -178,37 +179,35 @@
             watch: {
                 power(newValue) {
 
-                    if (this.positiveDirection === "right") {
-                        if (newValue < 0) {
-                            this.x0 = parseInt(this.width);
-                            this.x1 = 0;
-                            this.computeDirection();
-                        } else {
-                            this.x1 = 0;
-                            this.x0 = parseInt(this.width);
-                            this.computeDirection();
-                        }
-                    } else {
-                        
-                        if (newValue < 0) {
-                            this.x1 = 0;
-                            this.x0 = parseInt(this.width);
-                            this.computeDirection();
-                        } else {
-                            this.x0 = parseInt(this.width);
-                            this.x1 = 0;
-                            this.computeDirection();
-                        }
+                    console.log({ newValue });
+                    console.log(this.positiveDirection);
+
+                    // if (this.positiveDirection === "right") {
+                    //     if (this.power < 0) {
+                    //         this.x0 = parseInt(this.width);
+                    //         this.x1 = 0;
+                    //     }
+                    //     else {
+                    //         this.x1 = 0
+                    //         this.x0 = parseInt(this.width);
+                    //     }
+                    // } else {
+
+                    //     if (this.power > 0) {
+
+                    // LEFT!
+                    if (newValue > 0) {
+                        this.x0 = parseInt(this.width);
+                        this.x1 = 0;
+                    }
+                    else {
+                        this.x0 = 0
+                        this.x1 = parseInt(this.width);
                     }
 
-                    if (newValue == 0) {
-                        this.pixelsPerSecond = 0;
-                    } else {
-                        this.pixelsPerSecond = 20;
-                    }
+                    this.computeDirection();
 
-                    console.log(this.power);
-                    this.chevronLength = 0.1 * this.power;
+                    this.chevronLength = Math.abs(0.1 * this.power);
                 }
             },
             methods: {
@@ -238,7 +237,7 @@
 
                     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-                    if (this.power != 0) {
+                    if (this.power !== 0) {
                         this.ctx.lineWidth = this.lineWidth;
 
                         const red = this.power < 0 ? 200 : 0;
@@ -256,18 +255,19 @@
                             const color = `rgba(${red}, ${green}, 0, ${opacity})`;
 
                             this.ctx.strokeStyle = color;
+
                             this.ctx.beginPath();
                             this.ctx.moveTo(x + this.startX, y + this.startY);
                             this.ctx.lineTo(x, y);
                             this.ctx.lineTo(x + this.endX, y + this.endY);
                             this.ctx.stroke();
                         }
+                    }
 
-                        this.offset += this.pixelsPerSecond * delta / 1000;
+                    this.offset += this.pixelsPerSecond * delta / 1000;
 
-                        if (this.offset >= this.chevronSpace) {
-                            this.offset %= this.chevronSpace;
-                        }
+                    if (this.offset >= this.chevronSpace) {
+                        this.offset %= this.chevronSpace;
                     }
 
                     window.requestAnimationFrame(this.render);
@@ -280,26 +280,27 @@
                 this.y0 = 25;
                 this.y1 = 25;
 
-                if (this.positiveDirection === "right") {
-                    if (this.power < 0) {
-                        this.x0 = parseInt(this.width);
-                        this.x1 = 0;
-                    }
-                    else {
-                        this.x1 = 0
-                        this.x0 = parseInt(this.width);
-                    }
-                } else {
+                // if (this.positiveDirection === "right") {
+                //     if (this.power < 0) {
+                //         this.x0 = parseInt(this.width);
+                //         this.x1 = 0;
+                //     }
+                //     else {
+                //         this.x1 = 0
+                //         this.x0 = parseInt(this.width);
+                //     }
+                // }
+                // // else {
 
                     if (this.power > 0) {
                         this.x0 = parseInt(this.width);
                         this.x1 = 0;
                     }
                     else {
-                        this.x1 = 0
-                        this.x0 = parseInt(this.width);
+                        this.x0 = 0
+                        this.x1 = parseInt(this.width);
                     }
-                }
+                // }
 
                 // Length of our line (Euclidean distance)
                 this.length = Math.sqrt((this.x0 - this.x1) * (this.x0 - this.x1) + (this.y0 - this.y1) * (this.y0 - this.y1));
