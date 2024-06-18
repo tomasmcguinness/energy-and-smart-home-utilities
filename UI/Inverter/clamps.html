@@ -175,7 +175,7 @@
             },
             props: ["positive-direction", "power", "top", "left", "width"],
             template:
-                `<canvas ref="canvas" style="position: absolute;" :style="{'top': this.top + 'px','left': this.left + 'px'}" width="200" height="50"></canvas>`,
+                `<canvas ref="canvas" style="position: absolute;" :style="{'top': this.top + 'px','left': this.left + 'px'}" width="200" height="75"></canvas>`,
             watch: {
                 power(newValue) {
 
@@ -207,7 +207,7 @@
 
                     this.computeDirection();
 
-                    this.chevronLength = Math.abs(0.1 * this.power);
+                    this.chevronLength = Math.abs(0.05 * this.power);
                 }
             },
             methods: {
@@ -261,6 +261,9 @@
                             this.ctx.lineTo(x, y);
                             this.ctx.lineTo(x + this.endX, y + this.endY);
                             this.ctx.stroke();
+                            this.ctx.font = "28px serif";
+                            this.ctx.fillStyle = color;
+                            this.ctx.fillText(Math.abs(this.power) + "W",20,20);
                         }
                     }
 
@@ -277,8 +280,8 @@
                 this.canvas = this.$refs.canvas;
                 this.ctx = this.canvas.getContext("2d");
 
-                this.y0 = 25;
-                this.y1 = 25;
+                this.y0 = 45;
+                this.y1 = 45;
 
                 // if (this.positiveDirection === "right") {
                 //     if (this.power < 0) {
