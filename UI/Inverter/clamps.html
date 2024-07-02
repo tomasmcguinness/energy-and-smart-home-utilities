@@ -43,8 +43,8 @@
                 positive-direction="down"></energyflow-component>
             <energyflow-component top="260" left="640" :power="housePower" width="150" height="200"
                 orientation="vertical" positive-direction="down" always-negative="true"></energyflow-component>
-                <energyflow-component top="260" left="400" :power="evPower" width="150" height="200"
-                orientation="vertical" positive-direction="down" always-negative="true"></energyflow-component>
+            <energyflow-component top="260" left="427" :power="evPower" width="150" height="200" orientation="vertical"
+                positive-direction="down" always-negative="true"></energyflow-component>
         </div>
 
         <div style="position: absolute; top: 400px; left: 580px; z-index: 10;">
@@ -56,7 +56,9 @@
         <div v-if="showCharger" style="position: absolute; top: 610px; left: 375px; z-index: 10;">
             <button style="font-size: 50px; width: 150px; border-radius: 10px;"
                 :style="{'background-color': this.isChargerTurnedOn ? 'green' : '','color': this.isChargerTurnedOn ? 'white' : ''  }"
-                @click="toggleChargerFast">{{ this.isChargerTurnedOn ? 'ON' : 'OFF' }}</button>
+                @click="toggleChargerOnOff">{{ this.isChargerTurnedOn ? 'ON' : 'OFF' }}</button>
+
+                <button v-if="isChargerTurnedOn" style="font-size: 40px; margin-top: 10px; width: 150px; border-radius: 10px;" @click="toggleChargerMode">{{ this.isChargerEcoModeTurnedOn ? 'ECO' : 'FULL' }}</button>
         </div>
 
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
@@ -66,6 +68,10 @@
                 <g id="meter" class="cube-unit">
                     <rect width="150" height="150" x="1" y="1" fill="white" stroke="black" stroke-width="5" />
                     <text x="10" y="35" font-size="25">GRID</text>
+                </g>
+
+                <g id="clamp" class="cube-unit">
+                    <rect width="40" height="40" x="1" y="1" stroke="black" stroke-width="5" />
                 </g>
 
                 <g id="solar-panel" class="cube-unit">
@@ -84,7 +90,7 @@
 
                 <g id="charger" class="cube-unit">
                     <rect width="150" height="150" x="1" y="1" fill="white" stroke="black" stroke-width="5" />
-                    <text x="10" y="35" font-size="25">EV</text>                    
+                    <text x="10" y="35" font-size="25">EV</text>
                 </g>
 
                 <g id="consumer-unit" class="cube-unit">
@@ -113,9 +119,13 @@
 
             <use v-if="showCharger" xlink:href="#charger" x="375" y="450" />
             <line v-if="showCharger" x1="450" y1="250" x2="450" y2="450" style="stroke:black;stroke-width:5" />
+
+            <use v-if="showChargerClamp" xlink:href="#clamp" x="220" y="125" />
+            <line v-if="showChargerClamp" x1="240" y1="125" x2="240" y2="550" style="stroke:black;stroke-width:3" />
+            <line v-if="showChargerClamp" x1="240" y1="550" x2="375" y2="550" style="stroke:black;stroke-width:3" />
         </svg>
 
-        <div style="position: absolute; top: 1000px; left: 400px; z-index: 10;">
+        <div style="position: absolute; top: 1000px; left: 400px; z-index: 10; width: 400px;">
             <ul>
                 <li>
                     <input id="toggleInverter" type="checkbox" v-model="showInverter" />
@@ -128,6 +138,10 @@
                 <li>
                     <input id="toggleEVCharger" type="checkbox" v-model="showCharger" />
                     <label for="toggleEVCharger">Charger</label>
+                </li>
+                <li>
+                    <input id="toggleChargerClamp" type="checkbox" v-model="showChargerClamp" />
+                    <label for="toggleChargerClamp">Charger Clamp</label>
                 </li>
                 <input type="range" step="1" max="100" min="0" v-model="cloudCover" />
             </ul>
@@ -153,9 +167,13 @@
                 return {
                     showInverter: false,
                     showBattery: false,
-                    showCharger: false,
+                    showCharger: true,
                     isHouseTurnedOn: false,
                     isChargerTurnedOn: false,
+                    isChargerEcoModeTurnedOn: false,
+
+                    showChargerClamp: true,
+
                     housePowerConsumption: 500,
                     evFastPowerConsumption: 7000,
                     housePower: 0,
@@ -178,8 +196,11 @@
                 toggleHouseConsumption() {
                     this.isHouseTurnedOn = !this.isHouseTurnedOn;
                 },
-                toggleChargerFast() {
+                toggleChargerOnOff() {
                     this.isChargerTurnedOn = !this.isChargerTurnedOn;
+                },
+                toggleChargerMode() {
+                    this.isChargerEcoModeTurnedOn = !this.isChargerEcoModeTurnedOn;
                 },
                 calculatePowerFlow() {
 
@@ -202,7 +223,7 @@
                         this.housePower = 0;
                     }
 
-                    if(this.isChargerTurnedOn) {
+                    if (this.isChargerTurnedOn && !this.isChargerEcoModeTurnedOn) {
                         this.evPower = this.evFastPowerConsumption;
                     } else {
                         this.evPower = 0;
@@ -210,6 +231,13 @@
 
                     surplus = this.solarSystemPower - this.housePower - this.evPower;
 
+                    if (this.isChargerTurnedOn && this.isChargerEcoModeTurnedOn) {
+                        if(surplus > 0) {
+                        this.evPower = surplus;
+                        surplus = 0;
+                        }
+                    } 
+                    
                     this.gridPower = surplus;
                 }
             },
