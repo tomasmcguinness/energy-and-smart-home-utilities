@@ -39,7 +39,7 @@
                 positive-direction="right"></energyflow-component>
             <energyflow-component top="100" left="1080" :power="pvPower" width="100"
                 positive-direction="right"></energyflow-component>
-            <energyflow-component top="200" left="980" :power="batteryPower" height="300" orientation="vertical"
+            <energyflow-component top="210" left="980" :power="batteryPower" height="150" orientation="vertical"
                 positive-direction="down"></energyflow-component>
             <energyflow-component top="260" left="640" :power="housePower" width="150" height="200"
                 orientation="vertical" positive-direction="down" always-negative="true"></energyflow-component>
@@ -58,7 +58,9 @@
                 :style="{'background-color': this.isChargerTurnedOn ? 'green' : '','color': this.isChargerTurnedOn ? 'white' : ''  }"
                 @click="toggleChargerOnOff">{{ this.isChargerTurnedOn ? 'ON' : 'OFF' }}</button>
 
-                <button v-if="isChargerTurnedOn" style="font-size: 40px; margin-top: 10px; width: 150px; border-radius: 10px;" @click="toggleChargerMode">{{ this.isChargerEcoModeTurnedOn ? 'ECO' : 'FULL' }}</button>
+            <button v-if="isChargerTurnedOn"
+                style="font-size: 40px; margin-top: 10px; width: 150px; border-radius: 10px;"
+                @click="toggleChargerMode">{{ this.isChargerEcoModeTurnedOn ? 'ECO' : 'FULL' }}</button>
         </div>
 
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
@@ -80,12 +82,13 @@
 
                 <g id="inverter" class="cube-unit">
                     <rect width="150" height="150" x="1" y="1" fill="white" stroke="black" stroke-width="5" />
-                    <text x="10" y="35" font-size="25">INVERTER</text>
+                    <text x="10" y="35" font-size="25" >INVERTER</text>
                 </g>
 
                 <g id="battery" class="cube-unit">
                     <rect width="150" height="300" x="1" y="1" fill="white" stroke="black" stroke-width="5" />
                     <text x="10" y="35" font-size="25">BATTERY</text>
+                    <text x="10" y="75" font-size="25">{{this.batteryPercentage}}%</text>
                 </g>
 
                 <g id="charger" class="cube-unit">
@@ -165,10 +168,10 @@
             },
             data() {
                 return {
-                    showInverter: false,
-                    showBattery: false,
+                    showInverter: true,
+                    showBattery: true,
                     showCharger: true,
-                    isHouseTurnedOn: false,
+                    isHouseTurnedOn: true,
                     isChargerTurnedOn: false,
                     isChargerEcoModeTurnedOn: false,
 
@@ -181,8 +184,9 @@
                     gridPower: 0,
                     pvPower: 0,
                     batteryPower: 0,
+                    batteryPercentage: 100,
                     solarSystemPower: 0,
-                    cloudCover: 0
+                    cloudCover: 100
                 }
             },
             watch: {
@@ -205,12 +209,64 @@
                 calculatePowerFlow() {
 
                     if (this.showInverter) {
+                        // Calculate what the panels are generating.
+                        //
                         this.pvPower = 10 * parseInt(this.cloudCover);
-                        this.solarSystemPower = this.pvPower;
+                        //console.log(`PVPower: ${this.pvPower}`);
+
+                        if (this.showBattery) {
+
+                            const chargeRate = 25;
+
+                            if(this.batteryPower > 0) {
+                                this.batteryPercentage += chargeRate;
+                            } else if(this.batteryPower < 0) {
+                                this.batteryPercentage -= chargeRate;
+                            }
+
+                            if(this.batteryPercentage > 100) {
+                                this.batteryPercentage = 100;
+                                this.batteryPower = 0; // Cannot charge any more!
+                            } else if(this.batteryPercentage < 0) {
+                                this.batteryPercentage = 0;
+                                this.batteryPower = 0; // Cannot discharge any more!
+                            }
+
+                            // Take the previous grid power value....
+                            // 
+                            if (this.gridPower > 0) {
+                                console.log('Surplus detected.');
+
+                                if(this.batteryPercentage < 100) {
+                                    this.batteryPower += this.gridPower;
+                                } else {
+                                    this.batteryPower = 0;
+                                }
+
+                            } else if(this.gridPower < 0) {
+                                
+                                console.log('Discharging');
+
+                                if(this.batteryPercentage > 0) { 
+                                    this.batteryPower += this.gridPower; 
+                                } else {
+                                    this.batteryPower = 0;
+                                }
+                            } 
+
+                            console.log(`Battery Power: ${this.batteryPower}`);
+
+                            this.solarSystemPower = this.pvPower - this.batteryPower;
+
+                        } else {
+                            this.solarSystemPower = this.pvPower;
+                        }
                     } else {
                         this.pvPower = 0;
                         this.solarSystemPower = 0;
                     }
+
+                    console.log(`SolarSystem: ${this.solarSystemPower}`);
 
                     var surplus = 0;
                     var consumption = 0;
@@ -232,17 +288,19 @@
                     surplus = this.solarSystemPower - this.housePower - this.evPower;
 
                     if (this.isChargerTurnedOn && this.isChargerEcoModeTurnedOn) {
-                        if(surplus > 0) {
-                        this.evPower = surplus;
-                        surplus = 0;
+                        if (surplus > 0) {
+                            this.evPower = surplus;
+                            surplus = 0;
                         }
-                    } 
-                    
+                    }
+
+                    console.log(`Surplus: ${surplus}`);
+
                     this.gridPower = surplus;
                 }
             },
             mounted() {
-                setInterval(this.calculatePowerFlow, 100);
+                setInterval(this.calculatePowerFlow, 1000);
             }
         });
 
