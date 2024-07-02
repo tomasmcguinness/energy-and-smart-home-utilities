@@ -58,9 +58,15 @@
                 :style="{'background-color': this.isChargerTurnedOn ? 'green' : '','color': this.isChargerTurnedOn ? 'white' : ''  }"
                 @click="toggleChargerOnOff">{{ this.isChargerTurnedOn ? 'ON' : 'OFF' }}</button>
 
-            <button v-if="isChargerTurnedOn"
-                style="font-size: 40px; margin-top: 10px; width: 150px; border-radius: 10px;"
+            <button style="font-size: 40px; margin-top: 10px; width: 150px; border-radius: 10px;"
                 @click="toggleChargerMode">{{ this.isChargerEcoModeTurnedOn ? 'ECO' : 'FULL' }}</button>
+        </div>
+
+        <div style="position: absolute; top: 700px; left: 20px; z-index: 10;">
+            <button style="font-size: 50px; width: 150px; border-radius: 10px;"
+                :style="{'background-color': this.isRunning ? 'red' : 'green','color': this.isRunning ? 'white' : ''  }"
+                @click="toggleRunning">{{ this.isRunning ? 'STOP' : 'GO' }}</button>
+            <input type="range" step="1" max="1000" min="0" v-model="speed" />
         </div>
 
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
@@ -126,6 +132,11 @@
             <use v-if="showChargerClamp" xlink:href="#clamp" x="220" y="125" />
             <line v-if="showChargerClamp" x1="240" y1="125" x2="240" y2="550" style="stroke:black;stroke-width:3" />
             <line v-if="showChargerClamp" x1="240" y1="550" x2="375" y2="550" style="stroke:black;stroke-width:3" />
+
+            <use v-if="showInverterClamp" xlink:href="#clamp" x="320" y="125" />
+            <line v-if="showInverterClamp" x1="340" y1="125" x2="340" y2="25" style="stroke:black;stroke-width:3" />
+            <line v-if="showInverterClamp" x1="340" y1="25" x2="950" y2="25" style="stroke:black;stroke-width:3" />
+            <line v-if="showInverterClamp" x1="950" y1="25" x2="950" y2="50" style="stroke:black;stroke-width:3" />
         </svg>
 
         <div style="position: absolute; top: 1000px; left: 400px; z-index: 10; width: 400px;">
@@ -138,6 +149,10 @@
                     <input id="toggleBattery" type="checkbox" v-model="showBattery" />
                     <label for="toggleBattery">Battery</label>
                 </li>
+                <li v-if="showInverter">
+                    <input id="toggleInverterClamp" type="checkbox" v-model="showInverterClamp" />
+                    <label for="toggleInverterClamp">Inverter Clamp</label>
+                </li>
                 <li>
                     <input id="toggleEVCharger" type="checkbox" v-model="showCharger" />
                     <label for="toggleEVCharger">Charger</label>
@@ -146,7 +161,8 @@
                     <input id="toggleChargerClamp" type="checkbox" v-model="showChargerClamp" />
                     <label for="toggleChargerClamp">Charger Clamp</label>
                 </li>
-                <input type="range" step="1" max="100" min="0" v-model="cloudCover" />
+
+                <input type="range" step="10" max="100" min="0" v-model="cloudCover" />
             </ul>
         </div>
 
@@ -168,13 +184,16 @@
             },
             data() {
                 return {
-                    showInverter: true,
-                    showBattery: true,
-                    showCharger: true,
+                    isRunning: true,
+                    speed: 100,
+                    showInverter: false,
+                    showBattery: false,
+                    showCharger: false,
                     isHouseTurnedOn: true,
                     isChargerTurnedOn: false,
                     isChargerEcoModeTurnedOn: false,
-                    showChargerClamp: true,
+                    showChargerClamp: false,
+                    showInverterClamp: false,
                     housePowerConsumption: 500,
                     evFastPowerConsumption: 7000,
                     housePower: 0,
@@ -184,7 +203,7 @@
                     batteryPower: 0,
                     batteryPercentage: 100,
                     solarSystemPower: 0,
-                    cloudCover: 100
+                    cloudCover: 0
                 }
             },
             watch: {
@@ -192,10 +211,24 @@
                     if (!newValue) {
                         this.showSun = false;
                         this.showBattery = false;
+                        this.cloudCover = 0;
                     }
+                },
+                speed(newValue) {
+                    clearInterval(this.interval);
+                    this.interval = setInterval(this.calculatePowerFlow, newValue);
                 }
             },
             methods: {
+                toggleRunning() {
+                    if (this.isRunning) {
+                        clearInterval(this.interval);
+                        this.isRunning = false;
+                    } else {
+                        this.isRunning = true;
+                        this.interval = setInterval(this.calculatePowerFlow, this.speed);
+                    }
+                },
                 toggleHouseConsumption() {
                     this.isHouseTurnedOn = !this.isHouseTurnedOn;
                 },
@@ -211,11 +244,10 @@
                         // Calculate what the panels are generating.
                         //
                         this.pvPower = 10 * parseInt(this.cloudCover);
-                        //console.log(`PVPower: ${this.pvPower}`);
 
-                        if (this.showBattery) {
+                        if (this.showBattery && this.showInverterClamp) {
 
-                            const chargeRate = 5;
+                            const chargeRate = 1;
 
                             if (this.batteryPower > 0) {
                                 this.batteryPercentage += chargeRate;
@@ -237,7 +269,7 @@
                                 console.log('Inverter Detected Surplus.');
 
                                 if (this.batteryPercentage < 100) {
-                                    this.batteryPower += 100;
+                                    this.batteryPower += 10;
                                 } else {
                                     this.batteryPower = 0;
                                 }
@@ -247,7 +279,7 @@
                                 console.log('Discharging');
 
                                 if (this.batteryPercentage > 0) {
-                                    this.batteryPower -= 100;
+                                    this.batteryPower -= 10;
                                 } else {
                                     this.batteryPower = 0;
                                 }
@@ -281,16 +313,21 @@
                     this.gridPower = surplus;
 
                     if (this.isChargerTurnedOn) {
+                        if (this.isChargerEcoModeTurnedOn) {
+                            if (this.showChargerClamp) {
+                                if (this.gridPower > 0) {
+                                    console.log('Charger detected surplus, so gobble it up.');
+                                    this.evPower += 10;
+                                } else if (this.gridPower < 0) {
+                                    console.log('Charger has no surplus, so start stepping back until there is no surplus');
+                                    this.evPower -= 10;
 
-                        if (this.isChargerEcoModeTurnedOn && this.showChargerClamp) {
+                                    if(this.evPower < 0) {
+                                        this.evPower = 0;
+                                    }
 
-                            if (this.gridPower > 0) {
-                                console.log('Charger detected surplus, so gobble it up.');
-                                this.evPower += 100;
-                            } else if (this.gridPower < 0) {
-                                console.log('Charger has no surplus, so start stepping back until there is no surplus');
-                                this.evPower -= 100;
-                            }
+                                }
+                            } else { this.evPower = 0; }
                         } else {
                             this.evPower = this.evFastPowerConsumption;
                         }
@@ -300,7 +337,7 @@
                 }
             },
             mounted() {
-                setInterval(this.calculatePowerFlow, 250);
+                this.interval = setInterval(this.calculatePowerFlow, this.speed);
             }
         });
 
