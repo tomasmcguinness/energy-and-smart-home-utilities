@@ -35,15 +35,15 @@
         <div style="position: relative; z-index: 10;">
             <energyflow-component top="100" left="210" :power="gridPower" width="150"
                 positive-direction="left"></energyflow-component>
-            <energyflow-component top="100" left="740" :power="solarSystemPower" width="160"
+            <energyflow-component v-if="showInverter" top="100" left="740" :power="solarSystemPower" width="160"
                 positive-direction="right"></energyflow-component>
-            <energyflow-component top="100" left="1080" :power="pvPower" width="100"
+            <energyflow-component v-if="showInverter" top="100" left="1080" :power="pvPower" width="100"
                 positive-direction="right"></energyflow-component>
-            <energyflow-component top="210" left="980" :power="batteryPower" height="150" orientation="vertical"
+            <energyflow-component top="210" left="980" :power="batteryPower" height="130" orientation="vertical"
                 positive-direction="down"></energyflow-component>
-            <energyflow-component top="260" left="640" :power="housePower" width="150" height="200"
+            <energyflow-component top="260" left="640" :power="housePower" width="150" height="140"
                 orientation="vertical" positive-direction="down" always-negative="true"></energyflow-component>
-            <energyflow-component top="260" left="427" :power="evPower" width="150" height="200" orientation="vertical"
+            <energyflow-component top="260" left="430" :power="evPower" width="150" height="190" orientation="vertical"
                 positive-direction="down" always-negative="true"></energyflow-component>
         </div>
 
@@ -82,7 +82,7 @@
 
                 <g id="inverter" class="cube-unit">
                     <rect width="150" height="150" x="1" y="1" fill="white" stroke="black" stroke-width="5" />
-                    <text x="10" y="35" font-size="25" >INVERTER</text>
+                    <text x="10" y="35" font-size="25">INVERTER</text>
                 </g>
 
                 <g id="battery" class="cube-unit">
@@ -174,9 +174,7 @@
                     isHouseTurnedOn: true,
                     isChargerTurnedOn: false,
                     isChargerEcoModeTurnedOn: false,
-
                     showChargerClamp: true,
-
                     housePowerConsumption: 500,
                     evFastPowerConsumption: 7000,
                     housePower: 0,
@@ -193,6 +191,7 @@
                 showInverter(newValue) {
                     if (!newValue) {
                         this.showSun = false;
+                        this.showBattery = false;
                     }
                 }
             },
@@ -216,18 +215,18 @@
 
                         if (this.showBattery) {
 
-                            const chargeRate = 25;
+                            const chargeRate = 5;
 
-                            if(this.batteryPower > 0) {
+                            if (this.batteryPower > 0) {
                                 this.batteryPercentage += chargeRate;
-                            } else if(this.batteryPower < 0) {
+                            } else if (this.batteryPower < 0) {
                                 this.batteryPercentage -= chargeRate;
                             }
 
-                            if(this.batteryPercentage > 100) {
+                            if (this.batteryPercentage > 100) {
                                 this.batteryPercentage = 100;
                                 this.batteryPower = 0; // Cannot charge any more!
-                            } else if(this.batteryPercentage < 0) {
+                            } else if (this.batteryPercentage < 0) {
                                 this.batteryPercentage = 0;
                                 this.batteryPower = 0; // Cannot discharge any more!
                             }
@@ -235,30 +234,29 @@
                             // Take the previous grid power value....
                             // 
                             if (this.gridPower > 0) {
-                                console.log('Surplus detected.');
+                                console.log('Inverter Detected Surplus.');
 
-                                if(this.batteryPercentage < 100) {
-                                    this.batteryPower += this.gridPower;
+                                if (this.batteryPercentage < 100) {
+                                    this.batteryPower += 100;
                                 } else {
                                     this.batteryPower = 0;
                                 }
 
-                            } else if(this.gridPower < 0) {
-                                
+                            } else if (this.gridPower < 0) {
+
                                 console.log('Discharging');
 
-                                if(this.batteryPercentage > 0) { 
-                                    this.batteryPower += this.gridPower; 
+                                if (this.batteryPercentage > 0) {
+                                    this.batteryPower -= 100;
                                 } else {
                                     this.batteryPower = 0;
                                 }
-                            } 
-
-                            console.log(`Battery Power: ${this.batteryPower}`);
+                            }
 
                             this.solarSystemPower = this.pvPower - this.batteryPower;
 
                         } else {
+                            this.batteryPower = 0;
                             this.solarSystemPower = this.pvPower;
                         }
                     } else {
@@ -266,10 +264,7 @@
                         this.solarSystemPower = 0;
                     }
 
-                    console.log(`SolarSystem: ${this.solarSystemPower}`);
-
                     var surplus = 0;
-                    var consumption = 0;
 
                     // Work out the powerflow.
                     //
@@ -279,28 +274,33 @@
                         this.housePower = 0;
                     }
 
-                    if (this.isChargerTurnedOn && !this.isChargerEcoModeTurnedOn) {
-                        this.evPower = this.evFastPowerConsumption;
-                    } else {
-                        this.evPower = 0;
-                    }
-
                     surplus = this.solarSystemPower - this.housePower - this.evPower;
-
-                    if (this.isChargerTurnedOn && this.isChargerEcoModeTurnedOn) {
-                        if (surplus > 0) {
-                            this.evPower = surplus;
-                            surplus = 0;
-                        }
-                    }
 
                     console.log(`Surplus: ${surplus}`);
 
                     this.gridPower = surplus;
+
+                    if (this.isChargerTurnedOn) {
+
+                        if (this.isChargerEcoModeTurnedOn && this.showChargerClamp) {
+
+                            if (this.gridPower > 0) {
+                                console.log('Charger detected surplus, so gobble it up.');
+                                this.evPower += 100;
+                            } else if (this.gridPower < 0) {
+                                console.log('Charger has no surplus, so start stepping back until there is no surplus');
+                                this.evPower -= 100;
+                            }
+                        } else {
+                            this.evPower = this.evFastPowerConsumption;
+                        }
+                    } else {
+                        this.evPower = 0;
+                    }
                 }
             },
             mounted() {
-                setInterval(this.calculatePowerFlow, 1000);
+                setInterval(this.calculatePowerFlow, 250);
             }
         });
 
