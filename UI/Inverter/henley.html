@@ -38,7 +38,7 @@
             <energyflow-component top="100" left="800" :power="solarSystemPower" width="120"
                 positive-direction="left"></energyflow-component>
             <energyflow-component top="100" left="1080" :power="pvPower" width="100"
-                positive-direction="right"></energyflow-component>
+                positive-direction="left"></energyflow-component>
             <energyflow-component top="210" left="980" :power="batteryPower" height="130" orientation="vertical"
                 positive-direction="down"></energyflow-component>
             <energyflow-component top="170" left="280" :power="housePower" width="165" height="140"
@@ -60,13 +60,6 @@
 
             <button style="font-size: 40px; margin-top: 10px; width: 150px; border-radius: 10px;"
                 @click="toggleChargerMode">{{ this.isChargerEcoModeTurnedOn ? 'ECO' : 'FULL' }}</button>
-        </div>
-
-        <div style="position: absolute; top: 700px; left: 20px; z-index: 10;">
-            <button style="font-size: 50px; width: 150px; border-radius: 10px;"
-                :style="{'background-color': this.isRunning ? 'red' : 'green','color': this.isRunning ? 'white' : ''  }"
-                @click="toggleRunning">{{ this.isRunning ? 'STOP' : 'GO' }}</button>
-            <input type="range" step="1" max="1000" min="0" v-model="speed" />
         </div>
 
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
@@ -165,7 +158,7 @@
                 return {
                     isRunning: true,
                     speed: 100,
-                    isHouseTurnedOn: true,
+                    isHouseTurnedOn: false,
                     isChargerTurnedOn: false,
                     isChargerEcoModeTurnedOn: false,
                     housePowerConsumption: 500,
@@ -260,29 +253,28 @@
 
                     surplus = this.housePower;
 
-                    console.log(surplus);
-
                     if (this.isChargerTurnedOn) {
                         if (this.isChargerEcoModeTurnedOn) {
                                 if (this.gridPower > 0) {
                                     console.log('Charger detected surplus, so gobble it up.');
-                                    this.evPower += 10;
+                                    this.evPower -= 10;
                                 } else if (this.gridPower < 0) {
                                     console.log('Charger has no surplus, so start stepping back until there is no surplus');
-                                    this.evPower -= 10;
+                                    this.evPower += 10;
 
-                                    if (this.evPower < 0) {
+                                    if(this.evPower > 0) {
                                         this.evPower = 0;
                                     }
                                 }
                         } else {
-                            this.evPower = this.evFastPowerConsumption;
+                            this.evPower = -this.evFastPowerConsumption;
                         }
                     } else {
                         this.evPower = 0;
                     }
 
-                    this.gridPower = surplus -= this.evPower;
+                    this.gridPower = surplus += this.evPower;
+
                 }
             },
             mounted() {
@@ -325,12 +317,22 @@
 
                         // LEFT!
                         if (newValue > 0) {
-                            this.x0 = parseInt(this.width);
-                            this.x1 = 0;
+                            if(this.positiveDirection == "left") {
+                                this.x0 = parseInt(this.width);
+                                this.x1 = 0;
+                            } else {
+                                this.x0 = 0
+                                this.x1 = parseInt(this.width);    
+                            }
                         }
                         else {
+                            if(this.positiveDirection == "left") {
                             this.x0 = 0
                             this.x1 = parseInt(this.width);
+                            } else {
+                                this.x0 = parseInt(this.width);
+                                this.x1 = 0;
+                            }
                         }
                     }
 

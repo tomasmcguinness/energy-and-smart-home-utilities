@@ -34,7 +34,7 @@
 
         <div style="position: relative; z-index: 10;">
             <energyflow-component top="100" left="210" :power="gridPower" width="150"
-                positive-direction="left"></energyflow-component>
+                positive-direction="right"></energyflow-component>
             <energyflow-component v-if="showInverter" top="100" left="740" :power="solarSystemPower" width="160"
                 positive-direction="right"></energyflow-component>
             <energyflow-component v-if="showInverter" top="100" left="1080" :power="pvPower" width="100"
