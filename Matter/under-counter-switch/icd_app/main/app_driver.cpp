@@ -79,7 +79,7 @@ static void app_driver_button_release(void *arg, void *data)
 
 static void app_driver_button_long_pressed(void *arg, void *data)
 {
-    ESP_LOGI(TAG, "Long button pressed ");
+    ESP_LOGI(TAG, "Long button pressed");
     gpio_button *button = (gpio_button *)data;
     int switch_endpoint_id = (button != NULL) ? get_endpoint(button) : 1;
     // Press moves Position from 0 (idle) to 1 (press)

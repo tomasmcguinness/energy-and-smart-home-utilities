@@ -24,6 +24,9 @@
 #include <platform/ESP32/OpenthreadLauncher.h>
 #endif
 
+#include <app/server/CommissioningWindowManager.h>
+#include <app/server/Server.h>
+
 static const char *TAG = "app_main";
 
 static uint16_t configured_buttons = 0;
@@ -136,7 +139,7 @@ static esp_err_t create_button(struct gpio_button* button, node_t* node)
     generic_switch::config_t switch_config;
     endpoint_t *endpoint = generic_switch::create(node, &switch_config, ENDPOINT_FLAG_NONE, button_handle);
 
-    cluster_t* descriptor = cluster::get(endpoint,Descriptor::Id);
+    cluster_t* descriptor = cluster::get(endpoint, Descriptor::Id);
     descriptor::feature::taglist::add(descriptor);
 
     /* These node and endpoint handles can be used to create/add other endpoints and clusters. */
@@ -179,13 +182,11 @@ static esp_err_t create_button(struct gpio_button* button, node_t* node)
     /* Add additional features to the node */
     cluster_t *cluster = cluster::get(endpoint, Switch::Id);
 
-#if CONFIG_GENERIC_SWITCH_TYPE_LATCHING
-    cluster::switch_cluster::feature::latching_switch::add(cluster);
-#endif
-
-#if CONFIG_GENERIC_SWITCH_TYPE_MOMENTARY
     cluster::switch_cluster::feature::momentary_switch::add(cluster);
-#endif
+    //cluster::switch_cluster::feature::momentary_switch_long_press::add(cluster);
+
+
+    //cluster::switch_cluster::feature::momentary_switch_multi_press::add(cluster);
 
     return err;
 }
@@ -216,13 +217,12 @@ extern "C" void app_main()
     ABORT_APP_ON_FAILURE(err == ESP_OK, ESP_LOGE(TAG, "Failed to create generic switch button"));
 
     /* Use the code snippet commented below to create more physical buttons. */
+    struct gpio_button button;
+    button.GPIO_PIN_VALUE = GPIO_NUM_6;
+    err = create_button(&button, node);
 
-    /*  // Creating a gpio button. More buttons can be created in the same fashion specifying GPIO_PIN_VALUE.
-     *  struct gpio_button button;
-     *  button.GPIO_PIN_VALUE = GPIO_NUM_6;
-     *  // Call to createButton function to configure your button.
-     *  create_button(&button, node);
-     */
+    ABORT_APP_ON_FAILURE(err == ESP_OK, ESP_LOGE(TAG, "Failed to create generic switch button"));
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     /* Set OpenThread platform config */
     esp_openthread_platform_config_t config = {

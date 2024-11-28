@@ -4,3 +4,4 @@
 **/build
 /secrets.yaml
 UI/HeatingLayout/secrets.js
+**managed_components
