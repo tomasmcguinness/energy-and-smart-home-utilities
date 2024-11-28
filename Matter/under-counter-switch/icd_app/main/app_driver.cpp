@@ -6,15 +6,19 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
+#include <esp_err.h>
 #include <esp_log.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <common_macros.h>
 #include <esp_matter.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 
 #include <app_priv.h>
 #include <iot_button.h>
+
+#include "esp_sleep.h"
 
 #if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S3
 #define BUTTON_GPIO_PIN GPIO_NUM_0
@@ -126,21 +130,34 @@ static void app_driver_button_multipress_complete(void *arg, void *data)
     });
 }
 
+#define GPIO_WAKEUP_LEVEL       0
+
 app_driver_handle_t app_driver_button_init(gpio_button * button)
 {
     button_config_t config = {
         .type = BUTTON_TYPE_GPIO,
         .gpio_button_config = {
+            //.pin_bit_mask = BIT64(GPIO_WAKEUP_NUM),
             .gpio_num = BUTTON_GPIO_PIN,
             .active_level = 0,
+            //.intr_type = GPIO_INTR_DISABLE
+            //.mode = GPIO_MODE_INPUT,
         }
     };
 
+    
     if (button != NULL) {
         config.type = button_type_t::BUTTON_TYPE_GPIO;
         config.gpio_button_config.gpio_num = button->GPIO_PIN_VALUE;
     }
+
     button_handle_t handle = iot_button_create(&config);
+
+    esp_err_t err = gpio_wakeup_enable(BUTTON_GPIO_PIN, GPIO_WAKEUP_LEVEL == 0 ? GPIO_INTR_LOW_LEVEL : GPIO_INTR_HIGH_LEVEL);
+    ABORT_APP_ON_FAILURE(err == ESP_OK, ESP_LOGE(TAG, "Enable gpio wakeup failed"));
+    
+    err = esp_sleep_enable_gpio_wakeup();
+    ABORT_APP_ON_FAILURE(err == ESP_OK, ESP_LOGE(TAG, "Configure gpio as wakeup source failed"));
 
     iot_button_register_cb(handle, BUTTON_PRESS_DOWN, app_driver_button_initial_pressed, button);
     iot_button_register_cb(handle, BUTTON_PRESS_UP, app_driver_button_release, button);
