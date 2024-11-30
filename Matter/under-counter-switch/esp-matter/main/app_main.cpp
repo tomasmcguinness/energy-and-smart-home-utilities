@@ -166,7 +166,7 @@ extern "C" void app_main()
     ABORT_APP_ON_FAILURE(node != nullptr, ESP_LOGE(TAG, "Failed to create Matter node"));
 
     struct gpio_button button;
-    button.GPIO_PIN_VALUE = GPIO_NUM_9;
+    button.GPIO_PIN_VALUE = GPIO_NUM_12;
 
     app_driver_handle_t button_handle = app_driver_button_init(&button);
 
@@ -194,6 +194,12 @@ extern "C" void app_main()
     cluster_t *cluster = cluster::get(endpoint, Switch::Id);
 
     cluster::switch_cluster::feature::momentary_switch::add(cluster);
+    cluster::switch_cluster::feature::momentary_switch_release::add(cluster);
+    cluster::switch_cluster::feature::momentary_switch_long_press::add(cluster);
+
+    cluster::switch_cluster::feature::momentary_switch_multi_press::config_t multi_press_config;
+    multi_press_config.multi_press_max = 3;
+    cluster::switch_cluster::feature::momentary_switch_multi_press::add(cluster, &multi_press_config);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     /* Set OpenThread platform config */

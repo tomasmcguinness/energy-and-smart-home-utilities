@@ -130,7 +130,7 @@ static void app_driver_button_multipress_complete(void *arg, void *data)
     });
 }
 
-#define GPIO_WAKEUP_LEVEL       0
+#define GPIO_WAKEUP_LEVEL       1
 
 app_driver_handle_t app_driver_button_init(gpio_button * button)
 {
@@ -138,7 +138,7 @@ app_driver_handle_t app_driver_button_init(gpio_button * button)
         .type = BUTTON_TYPE_GPIO,
         .gpio_button_config = {
             .gpio_num = BUTTON_GPIO_PIN,
-            .active_level = 0,
+            .active_level = GPIO_WAKEUP_LEVEL,
             .enable_power_save = true,
         }
     };
