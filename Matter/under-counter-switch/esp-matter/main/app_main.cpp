@@ -30,6 +30,8 @@
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 
+#include <driver/rtc_io.h>
+
 static const char *TAG = "app_main";
 
 static uint16_t configured_buttons = 0;
@@ -166,7 +168,14 @@ extern "C" void app_main()
     ABORT_APP_ON_FAILURE(node != nullptr, ESP_LOGE(TAG, "Failed to create Matter node"));
 
     struct gpio_button button;
-    button.GPIO_PIN_VALUE = GPIO_NUM_12;
+
+    // For the H2, I'm using GPIO_NUM_12
+    // For the C6, using GPIO21/D3
+    button.GPIO_PIN_VALUE = GPIO_NUM_0;
+
+    ESP_LOGI(TAG, "****Valid: %d", rtc_gpio_is_valid_gpio(GPIO_NUM_0));
+    ESP_LOGI(TAG, "****Valid: %d", rtc_gpio_is_valid_gpio(GPIO_NUM_1));
+    ESP_LOGI(TAG, "****Valid: %d", rtc_gpio_is_valid_gpio(GPIO_NUM_2));
 
     app_driver_handle_t button_handle = app_driver_button_init(&button);
 

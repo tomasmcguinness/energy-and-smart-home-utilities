@@ -215,6 +215,6 @@ direct_dependencies:
 - espressif/json_parser
 - espressif/led_strip
 - espressif/mdns
-manifest_hash: c28bf5eb0f25d9ec0a7371187453a86d717a65f8b21cb42c3dadfd09d37c3a04
+manifest_hash: d57994320cdecfbb9d67379f3ec5e1e2d5a9617bf026a431af47ae45fb03e0cb
 target: esp32c6
 version: 2.0.0
