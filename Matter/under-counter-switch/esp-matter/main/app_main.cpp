@@ -225,4 +225,8 @@ extern "C" void app_main()
     ABORT_APP_ON_FAILURE(err == ESP_OK, ESP_LOGE(TAG, "Failed to start Matter, err:%d", err));
 
     ESP_LOGI(TAG, "Matter layer successfully started!");
+
+    // Turn on the user light!
+    //
+    //gpio_set_level(GPIO_NUM_15, 1);
 }
