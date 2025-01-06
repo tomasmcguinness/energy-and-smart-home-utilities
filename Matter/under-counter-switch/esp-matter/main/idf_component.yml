@@ -1,2 +1,2 @@
 dependencies:
-  espressif/button: ">=3.3.2"
+  espressif/button: "^3.4.0"

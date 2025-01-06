@@ -20,12 +20,6 @@
 
 #include "esp_sleep.h"
 
-#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S3
-#define BUTTON_GPIO_PIN GPIO_NUM_0
-#else // CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32C6 || CONFIG_IDF_TARGET_ESP32H2 || CONFIG_IDF_TARGET_ESP32C2
-#define BUTTON_GPIO_PIN GPIO_NUM_9
-#endif
-
 using namespace chip::app::Clusters;
 using namespace esp_matter;
 using namespace esp_matter::cluster;
@@ -134,33 +128,22 @@ static void app_driver_button_multipress_complete(void *arg, void *data)
 
 app_driver_handle_t app_driver_button_init(gpio_button * button)
 {
-    button_config_t config = {
-        .type = BUTTON_TYPE_GPIO,
-        .gpio_button_config = {
-            .gpio_num = BUTTON_GPIO_PIN,
-            .active_level = GPIO_WAKEUP_LEVEL,
-            .enable_power_save = true,
-        }
-    };
-    
-    if (button != NULL) {
-        config.type = button_type_t::BUTTON_TYPE_GPIO;
-        config.gpio_button_config.gpio_num = button->GPIO_PIN_VALUE;
-    }
+    button_config_t config;
+    memset(&config, 0, sizeof(button_config_t));
+
+    config.type = BUTTON_TYPE_GPIO;
+    config.gpio_button_config.gpio_num = button.GPIO_PIN_VALUE;
+    config.gpio_button_config.active_level = GPIO_WAKEUP_LEVEL;
+    config.gpio_button_config.enable_power_save = true;
 
     button_handle_t handle = iot_button_create(&config);
-
-    esp_err_t err = gpio_wakeup_enable(BUTTON_GPIO_PIN, GPIO_WAKEUP_LEVEL == 0 ? GPIO_INTR_LOW_LEVEL : GPIO_INTR_HIGH_LEVEL);
-    ABORT_APP_ON_FAILURE(err == ESP_OK, ESP_LOGE(TAG, "Enable gpio wakeup failed"));
     
-    err = esp_sleep_enable_gpio_wakeup();
-    ABORT_APP_ON_FAILURE(err == ESP_OK, ESP_LOGE(TAG, "Configure gpio as wakeup source failed"));
-
     iot_button_register_cb(handle, BUTTON_PRESS_DOWN, app_driver_button_initial_pressed, button);
     iot_button_register_cb(handle, BUTTON_PRESS_UP, app_driver_button_release, button);
-    iot_button_register_cb(handle, BUTTON_LONG_PRESS_START, app_driver_button_long_pressed, button);
-    iot_button_register_cb(handle, BUTTON_PRESS_REPEAT, app_driver_button_multipress_ongoing, button);
-    iot_button_register_cb(handle, BUTTON_PRESS_REPEAT_DONE, app_driver_button_multipress_complete, button);
+
+    // iot_button_register_cb(handle, BUTTON_LONG_PRESS_START, app_driver_button_long_pressed, button);
+    // iot_button_register_cb(handle, BUTTON_PRESS_REPEAT, app_driver_button_multipress_ongoing, button);
+    // iot_button_register_cb(handle, BUTTON_PRESS_REPEAT_DONE, app_driver_button_multipress_complete, button);
 
     return (app_driver_handle_t)handle;
 }

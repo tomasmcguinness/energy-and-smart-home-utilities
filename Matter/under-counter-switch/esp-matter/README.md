@@ -5,6 +5,10 @@
 
 The ESP32-C6 and ESP32-H2 chips are supported.
 
+## Setup ESP-IDF and ESP-MATTER
+
+Run . ./export.sh in both directories, starting with esp-idf
+
 
 
 

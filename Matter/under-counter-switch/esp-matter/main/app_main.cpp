@@ -151,16 +151,12 @@ extern "C" void app_main()
 
     nvs_flash_init();
 
-#if CONFIG_PM_ENABLE
     esp_pm_config_t pm_config = {
         .max_freq_mhz = CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ,
         .min_freq_mhz = CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ,
-#if CONFIG_FREERTOS_USE_TICKLESS_IDLE
         .light_sleep_enable = true
-#endif
     };
     err = esp_pm_configure(&pm_config);
-#endif
 
     /* Create a Matter node and add the mandatory Root Node device type on endpoint 0 */
     node::config_t node_config;
@@ -171,7 +167,7 @@ extern "C" void app_main()
 
     // For the H2, I'm using GPIO_NUM_12
     // For the C6, using GPIO21/D3
-    button.GPIO_PIN_VALUE = GPIO_NUM_0;
+    button.GPIO_PIN_VALUE = GPIO_NUM_21;
 
     ESP_LOGI(TAG, "****Valid: %d", rtc_gpio_is_valid_gpio(GPIO_NUM_0));
     ESP_LOGI(TAG, "****Valid: %d", rtc_gpio_is_valid_gpio(GPIO_NUM_1));
@@ -210,7 +206,6 @@ extern "C" void app_main()
     multi_press_config.multi_press_max = 3;
     cluster::switch_cluster::feature::momentary_switch_multi_press::add(cluster, &multi_press_config);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     /* Set OpenThread platform config */
     esp_openthread_platform_config_t config = {
         .radio_config = ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG(),
@@ -218,15 +213,10 @@ extern "C" void app_main()
         .port_config = ESP_OPENTHREAD_DEFAULT_PORT_CONFIG(),
     };
     set_openthread_platform_config(&config);
-#endif
 
     /* Matter start */
     err = esp_matter::start(app_event_cb);
     ABORT_APP_ON_FAILURE(err == ESP_OK, ESP_LOGE(TAG, "Failed to start Matter, err:%d", err));
 
     ESP_LOGI(TAG, "Matter layer successfully started!");
-
-    // Turn on the user light!
-    //
-    //gpio_set_level(GPIO_NUM_15, 1);
 }
