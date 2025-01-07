@@ -132,15 +132,14 @@ app_driver_handle_t app_driver_button_init(gpio_button * button)
     memset(&config, 0, sizeof(button_config_t));
 
     config.type = BUTTON_TYPE_GPIO;
-    config.gpio_button_config.gpio_num = button.GPIO_PIN_VALUE;
-    config.gpio_button_config.active_level = GPIO_WAKEUP_LEVEL;
+    config.gpio_button_config.gpio_num = GPIO_NUM_0;
+    config.gpio_button_config.active_level = 1;
     config.gpio_button_config.enable_power_save = true;
 
     button_handle_t handle = iot_button_create(&config);
     
     iot_button_register_cb(handle, BUTTON_PRESS_DOWN, app_driver_button_initial_pressed, button);
-    iot_button_register_cb(handle, BUTTON_PRESS_UP, app_driver_button_release, button);
-
+    // iot_button_register_cb(handle, BUTTON_PRESS_UP, app_driver_button_release, button);
     // iot_button_register_cb(handle, BUTTON_LONG_PRESS_START, app_driver_button_long_pressed, button);
     // iot_button_register_cb(handle, BUTTON_PRESS_REPEAT, app_driver_button_multipress_ongoing, button);
     // iot_button_register_cb(handle, BUTTON_PRESS_REPEAT_DONE, app_driver_button_multipress_complete, button);
