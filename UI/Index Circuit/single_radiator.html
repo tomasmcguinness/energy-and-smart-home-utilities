@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+<style type="text/css">
+    body {
+        position: absolute;
+        font-size: larger;
+    }
+
+    body button {
+        font-size: large;
+    }
+
+    #calls {
+        position: relative;
+        top: 50px;
+        left: 200px;
+        z-index: 10;
+    }
+
+    .hot-water-flowing {
+        stroke-dasharray: 2;
+        animation-duration: 160s;
+        animation-name: dash;
+        animation-timing-function: linear;
+        animation-direction: reverse;
+        animation-iteration-count: infinite;
+    }
+
+    .hot-water-flowing.reverse {
+        animation-direction: initial;
+    }
+
+    .radiator-pipe {
+    }
+
+    .path-hot-reverse {
+        /* stroke-dasharray: 2; */
+        /* animation: dash 160s linear infinite; */
+    }
+
+    .path-cold {
+        /* stroke-dasharray: 2; */
+        /* animation: dash 160s linear infinite; */
+    }
+
+    .path-cold-reverse {
+        /* stroke-dasharray: 2; */
+        /* animation: dash 160s linear reverse infinite; */
+    }
+
+    @keyframes dash {
+        to {
+            stroke-dashoffset: 1000;
+        }
+    }
+
+    html, body { margin:0; padding:0; overflow:y }
+    svg { position:fixed; top:0; left:0; height:1024px; width:1024px; }
+</style>
+
+<body>
+    <div id="calls">
+        <table>
+            <tr>
+                <td><button id="heatingButton" onclick="toggleHeatingValve()">Start Calling For Heat</button></td>
+            </tr>
+        </table>
+    </div>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" style="z-index: 1;">
+
+        <defs>
+            <g id="radiator" class="cube-unit">
+                <rect width="30" x="1" y="1" height="20" fill="white" stroke="black" stroke-width="1" />
+                <path class="radiator-pipe reverse" fill="none" stroke="red" stroke-width="1" d="m0,18 l0,8" />
+                <path class="radiator-pipe" fill="none" stroke="blue" stroke-width="1" d="m32,18 l0,9" />
+            </g>
+
+            <g id="valve" class="cube-unit">
+                <rect width="5" x="1" y="0" height="7" fill="grey" stroke="black" stroke-width="0.25" style="cursor: pointer;" />
+            </g>
+
+            <g id="valve-horizontal" class="cube-unit">
+                <rect width="7" x="1" y="0" height="5" fill="grey" stroke="black" stroke-width="0.25" style="cursor: pointer;" />
+            </g>
+
+            <g id="boiler" class="cube-unit">
+                <rect width="20" height="30" fill="white" stroke="black" stroke-width="1" />
+            </g>
+
+            <linearGradient id="linear-grad">
+                <stop offset="0" stop-color="red"/>
+                <stop offset="1" stop-color="blue"/>
+            </linearGradient>
+        </defs>
+
+        <use xlink:href="#boiler" x="10" y="10" />
+
+        <text id="boiler-temperature-label" x="13" y="35" font-size="12">-</text>
+
+        <path class="common-pipe" fill="none" stroke="red" stroke-width="2" d="M12,40.5 L12,62" />
+        <path class="common-pipe reverse" fill="none" stroke="blue" stroke-width="2" d="M18,40.5 L18,83" />
+
+        <path class="radiator-pipe" fill="none" stroke="red" stroke-width="2" d="M12,62 L12,181" />
+        <path class="radiator-pipe reverse" fill="none" stroke="blue" stroke-width="2" d="M18,83 L18,184" />
+
+        <path class="radiator-pipe" fill="none" stroke="red" stroke-width="2" d="M12,180 L140.5,180" />
+        <path class="radiator-pipe reverse" fill="none" stroke="blue" stroke-width="2" d="M18,183 L172.5,183" />
+
+        <use xlink:href="#valve" x="8.5" y="130" onclick="toggleHeatingValve()" title="Heating Valve" /> 
+
+        <use xlink:href="#radiator" x="25" y="155" /> 
+        <use xlink:href="#radiator" x="80" y="155" /> 
+        <use xlink:href="#radiator" x="140" y="155" /> 
+
+        <text class="radiator-temperature-label" x="35" y="170" font-size="12">-</text>
+        <text class="radiator-temperature-label" x="90" y="170" font-size="12">-</text>
+        <text class="radiator-temperature-label" x="150" y="170" font-size="12">-</text>
+
+    </svg>
+    <script src="<https://unpkg.com/mqtt/dist/mqtt.min.js>"></script>
+    <script type="text/javascript">
+
+        let isHeatingOn = false;
+        let isHotWaterOn = false;
+
+        function updateBoilerWaterTemperature() {
+            let temp = "";
+
+            if(isHotWaterOn) {
+                temp = "70";
+            } else if(isHeatingOn) {
+                temp = "40";
+            } 
+
+            var textNode = document.getElementById("boiler-temperature-label").childNodes[0];
+            textNode.nodeValue = temp;
+
+            for (const label of document.getElementsByClassName("radiator-temperature-label")) {
+                var node = label.childNodes[0];
+                node.nodeValue = temp;
+            }
+
+            document.getElementById("hotWaterButton").innerText = isHotWaterOn ? "Stop Calling For Hot Water" : "Start Calling For Hot Water";
+            document.getElementById("heatingButton").innerText = isHeatingOn ? "Stop Calling For Heat" : "Start Calling For Heat";
+        }
+
+        function toggleHotWaterValve() {
+            
+            if(isHotWaterOn) {
+                removeClass(document.getElementsByClassName("common-pipe"), "hot-water-flowing");
+                removeClass(document.getElementsByClassName("hot-water-pipe"), "hot-water-flowing");
+            } else {
+                addClass(document.getElementsByClassName("common-pipe"), "hot-water-flowing");
+                addClass(document.getElementsByClassName("hot-water-pipe"), "hot-water-flowing");
+            }
+
+            isHotWaterOn = !isHotWaterOn;
+
+            updateBoilerWaterTemperature();
+        }
+
+        function toggleHeatingValve() {
+
+            if(isHeatingOn) {
+                removeClass(document.getElementsByClassName("common-pipe"), "hot-water-flowing");
+                removeClass(document.getElementsByClassName("radiator-pipe"), "hot-water-flowing");
+            } else {
+                addClass(document.getElementsByClassName("common-pipe"), "hot-water-flowing");
+                addClass(document.getElementsByClassName("radiator-pipe"), "hot-water-flowing");
+            }
+
+            isHeatingOn = !isHeatingOn;
+
+            updateBoilerWaterTemperature();
+        }
+
+        function addClass(elements, className) {
+	        for (var i = 0; i < elements.length; i++) {
+		        var element = elements[i];
+		        if (element.classList) {
+			        element.classList.add(className);
+		        } else {
+			        element.className += ' ' + className;
+		        }
+	        }
+        }
+
+function removeClass(elements, className) {
+	for (var i = 0; i < elements.length; i++) {
+		var element = elements[i];
+		if (element.classList) {
+			element.classList.remove(className);
+		} else {
+			element.className = element.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+		}
+	}
+}
+    </script>
+</body>
+
+</html>

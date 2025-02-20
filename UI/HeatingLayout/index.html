@@ -130,7 +130,7 @@
 
         var client = new Paho.MQTT.Client("192.168.1.10", 9001, "clientId");
 
-        client.connect({ onSuccess:onConnect, userName: secret_mqtt_username, password: secret_mqtt_password });
+        client.connect({ onSuccess:onConnect, useSSL: true, cleanSession: true });
 
 
 // called when the client connects
@@ -142,7 +142,6 @@ function onConnect() {
   message.destinationName = "World";
   client.send(message);
 }
-//         const url = secret_mqtt_url;
 
 // const options = {
 //   clean: true,
