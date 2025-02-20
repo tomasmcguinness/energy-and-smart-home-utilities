@@ -1,0 +1,83 @@
+esphome:
+  name: 'office-solar-gain-sensor'
+  friendly_name: "Office Solar Gain Sensor"
+  platformio_options:
+    board_build.flash_mode: dio
+    board_build.mcu: esp32c3
+
+esp32:
+  board: esp32-c3-devkitm-1
+  variant: esp32c3
+  framework:
+    type: esp-idf
+
+wifi:
+  ssid: !secret wifi_ssid  
+  password: !secret wifi_password
+
+api:
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+logger:
+  hardware_uart: USB_SERIAL_JTAG
+  level: DEBUG
+
+i2c:
+  sda: GPIO6
+  scl: GPIO7
+  scan: true
+  frequency: 100kHz
+
+sensor:
+  - platform: bh1750
+    name: "Office Illuminance"
+    address: 0x23
+    update_interval: 10s
+    id: office_lux_level
+    on_value:
+      then:
+        - component.update: office_solar_gain
+
+  - platform: template
+    name: "Office Solar Gain"
+    id: "office_solar_gain"
+    unit_of_measurement: "W"
+    lambda: |-
+      const float luminous_efficacy = 105; // After direct sunlight luminous efficacy
+      const float area = 2.08; // Area of office window
+      return (id(office_lux_level).state * area) / luminous_efficacy;
+    accuracy_decimals: 1
+    update_interval: never
+
+  - platform: ee895
+    co2:
+      name: "Office CO2"
+      accuracy_decimals: 0
+    temperature:
+      name: "Office Temperature"
+      accuracy_decimals: 2
+    pressure:
+      name: "Office Pressure"
+      accuracy_decimals: 1
+    address: 0x5F
+    update_interval: 10s
+  
+  - platform: tcs34725
+    red_channel:
+      name: "Office Red Channel"
+    green_channel:
+      name: "Office Green Channel"
+    blue_channel:
+      name: "Office Blue Channel"
+    clear_channel:
+      name: "Office Clear Channel"
+    illuminance:
+      name: "Office Illuminance 2"
+    color_temperature:
+      name: "Office Color Temperature"
+    glass_attenuation_factor: 1.0
+    address: 0x29
+    update_interval: 10s

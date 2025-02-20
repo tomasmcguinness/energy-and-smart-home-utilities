@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+<style type="text/css">
+    body {
+        position: absolute;
+        font-size: larger;
+    }
+
+    body button {
+        font-size: large;
+    }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: y
+    }
+
+    svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 1080px;
+        width: 1920px;
+        z-index: 1;
+    }
+</style>
+
+<body>
+
+    <div id="app" style="position: relative;">
+
+        <div style="position: relative; z-index: 10;">
+            <energyflow-component top="100" left="210" :power="gridPower" width="150"
+                positive-direction="right"></energyflow-component>
+            <energyflow-component v-if="showInverter" top="100" left="740" :power="solarSystemPower" width="160"
+                positive-direction="right"></energyflow-component>
+            <energyflow-component v-if="showInverter" top="100" left="1080" :power="pvPower" width="100"
+                positive-direction="right"></energyflow-component>
+            <energyflow-component top="210" left="980" :power="batteryPower" height="130" orientation="vertical"
+                positive-direction="down"></energyflow-component>
+            <energyflow-component top="260" left="640" :power="housePower" width="150" height="140"
+                orientation="vertical" positive-direction="down" always-negative="true"></energyflow-component>
+            <energyflow-component top="260" left="430" :power="evPower" width="150" height="190" orientation="vertical"
+                positive-direction="down" always-negative="true"></energyflow-component>
+        </div>
+
+        <div style="position: absolute; top: 400px; left: 580px; z-index: 10;">
+            <button style="font-size: 50px; width: 150px; border-radius: 10px;"
+                :style="{'background-color': this.isHouseTurnedOn ? 'green' : '','color': this.isHouseTurnedOn ? 'white' : ''  }"
+                @click="toggleHouseConsumption">{{ this.isHouseTurnedOn ? 'ON' : 'OFF' }}</button>
+        </div>
+
+        <div v-if="showCharger" style="position: absolute; top: 610px; left: 375px; z-index: 10;">
+            <button style="font-size: 50px; width: 150px; border-radius: 10px;"
+                :style="{'background-color': this.isChargerTurnedOn ? 'green' : '','color': this.isChargerTurnedOn ? 'white' : ''  }"
+                @click="toggleChargerOnOff">{{ this.isChargerTurnedOn ? 'ON' : 'OFF' }}</button>
+
+            <button style="font-size: 40px; margin-top: 10px; width: 150px; border-radius: 10px;"
+                @click="toggleChargerMode">{{ this.isChargerEcoModeTurnedOn ? 'ECO' : 'FULL' }}</button>
+        </div>
+
+        <div style="position: absolute; top: 700px; left: 20px; z-index: 10;">
+            <button style="font-size: 50px; width: 150px; border-radius: 10px;"
+                :style="{'background-color': this.isRunning ? 'red' : 'green','color': this.isRunning ? 'white' : ''  }"
+                @click="toggleRunning">{{ this.isRunning ? 'STOP' : 'GO' }}</button>
+            <input type="range" step="1" max="1000" min="0" v-model="speed" />
+        </div>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+
+            <defs>
+
+                <g id="meter" class="cube-unit">
+                    <rect width="150" height="150" x="1" y="1" fill="white" stroke="black" stroke-width="5" />
+                    <text x="10" y="35" font-size="25">GRID</text>
+                </g>
+
+                <g id="clamp" class="cube-unit">
+                    <rect width="40" height="40" x="1" y="1" stroke="black" stroke-width="5" />
+                </g>
+
+                <g id="solar-panel" class="cube-unit">
+                    <rect width="70" height="120" x="1" y="1" fill="black" stroke="gray" stroke-width="2" />
+                </g>
+
+                <g id="inverter" class="cube-unit">
+                    <rect width="150" height="150" x="1" y="1" fill="white" stroke="black" stroke-width="5" />
+                    <text x="10" y="35" font-size="25">INVERTER</text>
+                </g>
+
+                <g id="battery" class="cube-unit">
+                    <rect width="150" height="300" x="1" y="1" fill="white" stroke="black" stroke-width="5" />
+                    <text x="10" y="35" font-size="25">BATTERY</text>
+                    <text x="10" y="75" font-size="25">{{this.batteryPercentage}}%</text>
+                </g>
+
+                <g id="charger" class="cube-unit">
+                    <rect width="150" height="150" x="1" y="1" fill="white" stroke="black" stroke-width="5" />
+                    <text x="10" y="35" font-size="25">EV</text>
+                </g>
+
+                <g id="consumer-unit" class="cube-unit">
+                    <rect width="350" height="200" x="1" y="1" fill="white" stroke="black" stroke-width="5"
+                        style="cursor: pointer;" />
+                    <text x="10" y="35" font-size="25">CONSUMER UNIT</text>
+                </g>
+
+            </defs>
+
+            <use xlink:href="#meter" x="50" y="50" />
+
+            <line x1="660" y1="250" x2="660" y2="450" style="stroke:black;stroke-width:5" />
+
+            <line x1="200" y1="150" x2="375" y2="150" style="stroke:black;stroke-width:5" />
+            <use xlink:href="#consumer-unit" x="375" y="50" />
+
+            <use v-if="showInverter" xlink:href="#inverter" x="925" y="50" />
+            <line v-if="showInverter" x1="725" y1="150" x2="925" y2="150" style="stroke:black;stroke-width:5" />
+
+            <line v-if="showInverter" x1="1075" y1="150" x2="1200" y2="150" style="stroke:black;stroke-width:2" />
+            <use v-if="showBattery" xlink:href="#battery" x="925" y="350" />
+
+            <use v-if="showInverter" xlink:href="#solar-panel" x="1200" y="50" />
+            <line v-if="showBattery" x1="1000" y1="200" x2="1000" y2="350" style="stroke:black;stroke-width:5" />
+
+            <use v-if="showCharger" xlink:href="#charger" x="375" y="450" />
+            <line v-if="showCharger" x1="450" y1="250" x2="450" y2="450" style="stroke:black;stroke-width:5" />
+
+            <use v-if="showChargerClamp" xlink:href="#clamp" x="220" y="125" />
+            <line v-if="showChargerClamp" x1="240" y1="125" x2="240" y2="550" style="stroke:black;stroke-width:3" />
+            <line v-if="showChargerClamp" x1="240" y1="550" x2="375" y2="550" style="stroke:black;stroke-width:3" />
+
+            <use v-if="showInverterClamp" xlink:href="#clamp" x="320" y="125" />
+            <line v-if="showInverterClamp" x1="340" y1="125" x2="340" y2="25" style="stroke:black;stroke-width:3" />
+            <line v-if="showInverterClamp" x1="340" y1="25" x2="950" y2="25" style="stroke:black;stroke-width:3" />
+            <line v-if="showInverterClamp" x1="950" y1="25" x2="950" y2="50" style="stroke:black;stroke-width:3" />
+        </svg>
+
+        <div style="position: absolute; top: 1000px; left: 400px; z-index: 10; width: 400px;">
+            <ul>
+                <li>
+                    <input id="toggleInverter" type="checkbox" v-model="showInverter" />
+                    <label for="toggleInverter">Inverter</label>
+                </li>
+                <li v-if="showInverter">
+                    <input id="toggleBattery" type="checkbox" v-model="showBattery" />
+                    <label for="toggleBattery">Battery</label>
+                </li>
+                <li v-if="showInverter">
+                    <input id="toggleInverterClamp" type="checkbox" v-model="showInverterClamp" />
+                    <label for="toggleInverterClamp">Inverter Clamp</label>
+                </li>
+                <li>
+                    <input id="toggleEVCharger" type="checkbox" v-model="showCharger" />
+                    <label for="toggleEVCharger">Charger</label>
+                </li>
+                <li>
+                    <input id="toggleChargerClamp" type="checkbox" v-model="showChargerClamp" />
+                    <label for="toggleChargerClamp">Charger Clamp</label>
+                </li>
+
+                <input type="range" step="10" max="100" min="0" v-model="cloudCover" />
+            </ul>
+        </div>
+
+        <img src="sun.jpg" v-if="showInverter" style="position: absolute; top: 20px; left: 1300px; width: 100px;">
+        <img src="cloud.png" v-if="showInverter" style="position: absolute; top: 30px; width: 100px;"
+            :style="{'left': (parseInt(this.cloudCover) + 1300) + 'px'}">
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script type="text/javascript">
+        const { createApp, ref } = Vue;
+
+        var app = createApp({
+            setup() {
+                const message = ref('Hello vue!')
+                return {
+                    message
+                }
+            },
+            data() {
+                return {
+                    isRunning: true,
+                    speed: 100,
+                    showInverter: false,
+                    showBattery: false,
+                    showCharger: false,
+                    isHouseTurnedOn: true,
+                    isChargerTurnedOn: false,
+                    isChargerEcoModeTurnedOn: false,
+                    showChargerClamp: false,
+                    showInverterClamp: false,
+                    housePowerConsumption: 500,
+                    evFastPowerConsumption: 7000,
+                    housePower: 0,
+                    evPower: 0,
+                    gridPower: 0,
+                    pvPower: 0,
+                    batteryPower: 0,
+                    batteryPercentage: 100,
+                    solarSystemPower: 0,
+                    cloudCover: 0
+                }
+            },
+            watch: {
+                showInverter(newValue) {
+                    if (!newValue) {
+                        this.showSun = false;
+                        this.showBattery = false;
+                        this.cloudCover = 0;
+                    }
+                },
+                speed(newValue) {
+                    clearInterval(this.interval);
+                    this.interval = setInterval(this.calculatePowerFlow, newValue);
+                }
+            },
+            methods: {
+                toggleRunning() {
+                    if (this.isRunning) {
+                        clearInterval(this.interval);
+                        this.isRunning = false;
+                    } else {
+                        this.isRunning = true;
+                        this.interval = setInterval(this.calculatePowerFlow, this.speed);
+                    }
+                },
+                toggleHouseConsumption() {
+                    this.isHouseTurnedOn = !this.isHouseTurnedOn;
+                },
+                toggleChargerOnOff() {
+                    this.isChargerTurnedOn = !this.isChargerTurnedOn;
+                },
+                toggleChargerMode() {
+                    this.isChargerEcoModeTurnedOn = !this.isChargerEcoModeTurnedOn;
+                },
+                calculatePowerFlow() {
+
+                    if (this.showInverter) {
+                        // Calculate what the panels are generating.
+                        //
+                        this.pvPower = 10 * parseInt(this.cloudCover);
+
+                        if (this.showBattery && this.showInverterClamp) {
+
+                            const chargeRate = 1;
+
+                            if (this.batteryPower > 0) {
+                                this.batteryPercentage += chargeRate;
+                            } else if (this.batteryPower < 0) {
+                                this.batteryPercentage -= chargeRate;
+                            }
+
+                            if (this.batteryPercentage > 100) {
+                                this.batteryPercentage = 100;
+                                this.batteryPower = 0; // Cannot charge any more!
+                            } else if (this.batteryPercentage < 0) {
+                                this.batteryPercentage = 0;
+                                this.batteryPower = 0; // Cannot discharge any more!
+                            }
+
+                            // Take the previous grid power value....
+                            // 
+                            if (this.gridPower > 0) {
+                                console.log('Inverter Detected Surplus.');
+
+                                if (this.batteryPercentage < 100) {
+                                    this.batteryPower += 10;
+                                } else {
+                                    this.batteryPower = 0;
+                                }
+
+                            } else if (this.gridPower < 0) {
+
+                                console.log('Discharging');
+
+                                if (this.batteryPercentage > 0) {
+                                    this.batteryPower -= 10;
+                                } else {
+                                    this.batteryPower = 0;
+                                }
+                            }
+
+                            this.solarSystemPower = this.pvPower - this.batteryPower;
+
+                        } else {
+                            this.batteryPower = 0;
+                            this.solarSystemPower = this.pvPower;
+                        }
+                    } else {
+                        this.pvPower = 0;
+                        this.solarSystemPower = 0;
+                    }
+
+                    var surplus = 0;
+
+                    // Work out the powerflow.
+                    //
+                    if (this.isHouseTurnedOn) {
+                        this.housePower = this.housePowerConsumption;
+                    } else {
+                        this.housePower = 0;
+                    }
+
+                    surplus = this.solarSystemPower - this.housePower - this.evPower;
+
+                    console.log(`Surplus: ${surplus}`);
+
+                    this.gridPower = surplus;
+
+                    if (this.isChargerTurnedOn) {
+                        if (this.isChargerEcoModeTurnedOn) {
+                            if (this.showChargerClamp) {
+                                if (this.gridPower > 0) {
+                                    console.log('Charger detected surplus, so gobble it up.');
+                                    this.evPower += 10;
+                                } else if (this.gridPower < 0) {
+                                    console.log('Charger has no surplus, so start stepping back until there is no surplus');
+                                    this.evPower -= 10;
+
+                                    if(this.evPower < 0) {
+                                        this.evPower = 0;
+                                    }
+
+                                }
+                            } else { this.evPower = 0; }
+                        } else {
+                            this.evPower = this.evFastPowerConsumption;
+                        }
+                    } else {
+                        this.evPower = 0;
+                    }
+                }
+            },
+            mounted() {
+                this.interval = setInterval(this.calculatePowerFlow, this.speed);
+            }
+        });
+
+        app.component('energyflow-component', {
+            data() {
+                return {
+                    pixelsPerSecond: 20,
+                    fadeLength: 20,
+                    lineWidth: 5,
+                    prevTimestamp: undefined,
+                    offset: 0,
+                    chevronSpace: 12,
+                    chevronAngle: 0.7 * Math.PI,
+                    chevronLength: 20
+                }
+            },
+            props: ["positive-direction", "power", "top", "left", "width", "orientation", "height", "always-negative"],
+            template:
+                `<canvas ref="canvas" style="position: absolute;" :style="{'top': this.top + 'px','left': this.left + 'px'}" :width="this.width" :height="this.height"></canvas>`,
+            watch: {
+                power(newValue) {
+
+                    if (this.orientation == "vertical") {
+
+                        this.x0 = 20;
+                        this.x1 = 20;
+
+                        if (this.power > 0) {
+                            this.y0 = 0;
+                            this.y1 = parseInt(this.height);
+                        } else {
+                            this.y0 = parseInt(this.height);
+                            this.y1 = 0;
+                        }
+                    } else {
+
+                        // LEFT!
+                        if (newValue > 0) {
+                            this.x0 = parseInt(this.width);
+                            this.x1 = 0;
+                        }
+                        else {
+                            this.x0 = 0
+                            this.x1 = parseInt(this.width);
+                        }
+                    }
+
+                    this.computeDirection();
+                }
+            },
+            methods: {
+                computeDirection() {
+
+                    var l = Math.abs(0.05 * this.power);
+
+                    if (l < 5) { l = 5; } else if (l > 30) {
+                        l = 30;
+                    }
+
+                    this.chevronLength = l;
+
+                    // Angle between our line and the x-axis in radians
+                    this.angle = Math.atan2(this.y1 - this.y0, this.x1 - this.x0);
+
+                    // Offset of the first point of a chevron relative to its center point
+                    // calculated by subtracting the chevron angle from the line angle
+                    this.startX = Math.cos(this.angle - this.chevronAngle) * this.chevronLength;
+                    this.startY = Math.sin(this.angle - this.chevronAngle) * this.chevronLength;
+
+                    // Offset of the third point of a chevron relative to its center point
+                    // calculated by adding the chevron angle to the line angle
+                    this.endX = Math.cos(this.angle + this.chevronAngle) * this.chevronLength;
+                    this.endY = Math.sin(this.angle + this.chevronAngle) * this.chevronLength;
+                },
+                render(timestamp) {
+
+                    const delta = this.prevTimestamp ? timestamp - this.prevTimestamp : 0;
+                    this.prevTimestamp = timestamp;
+
+                    const n = Math.floor(this.length / this.chevronSpace);
+
+                    const offsetX = this.offset * Math.cos(this.angle);
+                    const offsetY = this.offset * Math.sin(this.angle);
+
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                    if (this.power !== 0) {
+                        this.ctx.lineWidth = this.lineWidth;
+
+                        var red = 0;
+                        var green = 0;
+
+                        if (this.alwaysNegative) {
+                            red = 200;
+                        } else {
+                            red = this.power < 0 ? 200 : 0;
+                            green = this.power > 0 ? 200 : 0;
+                        }
+
+                        for (let i = 0; i < n; i++) {
+                            const x = this.x0 + (this.x1 - this.x0) * i / n + offsetX;
+                            const y = this.y0 + (this.y1 - this.y0) * i / n + offsetY;
+
+                            // The opacity depends on how close we are to the start (0) or end
+                            // (n * chevronSpace) of the line
+                            const dist = Math.min(i * this.chevronSpace + this.offset, n * this.chevronSpace - (i * this.chevronSpace + this.offset));
+                            const opacity = Math.min(1, dist / this.fadeLength);
+
+                            const color = `rgba(${red}, ${green}, 0, ${opacity})`;
+
+                            this.ctx.strokeStyle = color;
+
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(x + this.startX, y + this.startY);
+                            this.ctx.lineTo(x, y);
+                            this.ctx.lineTo(x + this.endX, y + this.endY);
+                            this.ctx.stroke();
+                            this.ctx.font = "28px serif";
+                            this.ctx.fillStyle = color;
+                            this.ctx.fillText(Math.abs(this.power) + "W", this.orientation == "vertical" ? 50 : 20, 20);
+                        }
+                    }
+
+                    this.offset += this.pixelsPerSecond * delta / 1000;
+
+                    if (this.offset >= this.chevronSpace) {
+                        this.offset %= this.chevronSpace;
+                    }
+
+                    window.requestAnimationFrame(this.render);
+                }
+            },
+            mounted() {
+                this.canvas = this.$refs.canvas;
+                this.ctx = this.canvas.getContext("2d");
+
+                if (this.orientation == "vertical") {
+
+                    this.x0 = 20;
+                    this.x1 = 20;
+
+                    if (this.power > 0) {
+                        this.y0 = 0;
+                        this.y1 = parseInt(this.height);
+                    } else {
+                        this.y0 = parseInt(this.height);
+                        this.y1 = 0;
+                    }
+                } else {
+                    this.y0 = 50;
+                    this.y1 = 50;
+
+                    // LEFT
+                    if (this.power > 0) {
+                        this.x0 = parseInt(this.width);
+                        this.x1 = 0;
+                    }
+                    else {
+                        this.x0 = 0
+                        this.x1 = parseInt(this.width);
+                    }
+                }
+
+                // Length of our line (Euclidean distance)
+                this.length = Math.sqrt((this.x0 - this.x1) * (this.x0 - this.x1) + (this.y0 - this.y1) * (this.y0 - this.y1));
+
+                this.computeDirection();
+
+                window.requestAnimationFrame(this.render);
+            }
+        });
+
+        app.mount('#app')
+    </script>
+</body>
+
+</html>

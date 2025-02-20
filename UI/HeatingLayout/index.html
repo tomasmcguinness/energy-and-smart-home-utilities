@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style type="text/css">
     .path-hot {
         /* stroke-dasharray: 2; */
@@ -29,7 +29,7 @@
     }
 
     html, body { margin:0; padding:0; overflow:y }
-    svg { position:fixed; top:0; left:0; height:1024px; width:1024px; }
+    svg { position:fixed; top:0; left:0; height:1080px; width:1024px; }
 </style>
 
 <head>
@@ -37,13 +37,14 @@
 </head>
 
 <body>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 250">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 310">
 
         <defs>
             <g id="radiator" class="cube-unit">
                 <rect width="30" x="1" y="1" height="20" fill="white" stroke="black" stroke-width="1" />
                 <path class="path-hot-reverse" fill="none" stroke="red" stroke-width="1" d="m0,18 l0,7" />
                 <path class="path-cold-reverse" fill="none" stroke="blue" stroke-width="1" d="m32,18 l0,9" />
+                <text x="10" y="14" font-size="5">700W</text>
             </g>
 
             <g id="heat-meter" class="cube-unit">
@@ -59,66 +60,70 @@
 
         <use xlink:href="#boiler" x="10" y="10" />
 
-        <path class="path-hot" fill="none" stroke="red" stroke-width="2" d="M12,40.5 L12,225.5" />
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="2" d="M15,40.5 L15,227" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="2" d="M12,40.5 L12,185.5" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="2" d="M15,40.5 L15,187" />
 
-        <text x="25" y="200" font-size="5">Hallway</text>
-        <use xlink:href="#radiator" x="25" y="200" /> 
-        
-        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,225 25.5,225" />
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,226.5 L57.5,226.5" />
+        <text x="25" y="48" font-size="5">UFH</text>
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,50.5 L40,50.5 L40,55" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M40,55 L40,60 L15,60" />
 
-        <text x="50" y="30" font-size="5">Landing</text>
-        <use xlink:href="#radiator" x="50" y="30" /> 
+        <text x="25" y="160" font-size="5">HALLWAY</text>
+        <use xlink:href="#radiator" x="25" y="160" /> 
 
-        <text x="55" y="65" font-size="5">Bathroom</text>
-        <use xlink:href="#radiator" x="55" y="65" /> 
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M12,185 25.5,185" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,186.5 L57.5,186.5" />
 
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M52,128 L52,56.5" />
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M51.5,56.5 L82,56.5" />
-        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M50,125 L50,55" />
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M51.5,91.5 87,91.5" />
-        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M50,90 L55.5,90" />
+        <text x="50" y="10" font-size="5">LANDING</text>
+        <use xlink:href="#radiator" x="50" y="10" /> 
 
-        <text x="85" y="100" font-size="5">Office</text>
-        <use xlink:href="#radiator" x="85" y="100" /> 
+        <text x="55" y="45" font-size="5">BATHROOM</text>
+        <use xlink:href="#radiator" x="55" y="45" /> 
 
-        <text x="172" y="100" font-size="5">Front Bedroom</text>
-        <use xlink:href="#radiator" x="172" y="100" /> 
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M52,108 L52,36.5" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M51.5,36.5 L82,36.5" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M50,105 L50,35" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M51.5,71.5 87,71.5" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M50,70 L55.5,70" />
 
-        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M132,124.5 L172,124.5" />
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,127.5 L204.5,127.5" />
+        <text x="85" y="80" font-size="5">OFFICE</text>
+        <use xlink:href="#radiator" x="85" y="80" /> 
 
-        <text x="126.6" y="25" font-size="5">Master Bedroom</text>
-        <use xlink:href="#radiator" x="126.5" y="25" /> 
+        <text x="172" y="80" font-size="5">FRONT BEDROOM</text>
+        <use xlink:href="#radiator" x="172" y="80" /> 
 
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="2" d="M130,127.5 L130,52" />
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M130,52.5 L159,52.5" />
-        <path class="path-hot" fill="none" stroke="red" stroke-width="2" d="M127,125 L127,50" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M132,104.5 L172,104.5" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M15,107.5 L204.5,107.5" />
+
+        <text x="127.6" y="10" font-size="5">MASTER BEDROOM</text>
+        <use xlink:href="#radiator" x="127" y="10" /> 
+
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M130,107.5 L130,36.1" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M130,36.6 L159,36.5" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M127,105 L127,35" />
 
         <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M126.5,90.5 L137,90.5" />
         <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M127.5,92 L169,92" />
 
-        <text x="136.6" y="65" font-size="5">Back Bedroom</text>
+        <text x="136.6" y="65" font-size="5">BACK BEDROOM</text>
         <use xlink:href="#radiator" x="136.5" y="65" /> 
 
-        <path class="path-hot" fill="none" stroke="red" stroke-width="2" d="M12,125 L132,125" />
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="2" d="M15,128 L132,128" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="2" d="M12,105 L132,105" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="2" d="M15,108 L132,108" />
 
-        <path class="path-hot" fill="none" stroke="red" stroke-width="2" d="M12,180 L125,180" />
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="2" d="M15,183 L125,183" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="2" d="M12,145 L125,145" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="2" d="M15,148 L125,148" />
 
-        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M125,179.5 L140.5,179.5" />
-        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M125,182.5 L172.5,182.5" />
+        <path class="path-hot" fill="none" stroke="red" stroke-width="1" d="M125,144.5 L140.5,144.5" />
+        <path class="path-cold" fill="none" stroke="blue" stroke-width="1" d="M125,147.5 L172.5,147.5" />
 
-        <text x="25" y="155" font-size="5">Sitting Room</text>
-        <use xlink:href="#radiator" x="25" y="155" /> 
+        <text x="25" y="120" font-size="5">SITTING ROOM</text>
+        <use xlink:href="#radiator" x="25" y="120" /> 
 
-        <text x="72" y="155" font-size="5">Living Room</text>
-        <use xlink:href="#radiator" x="72" y="155" /> 
+        <text x="72" y="120" font-size="5">LIVING ROOM</text>
+        <use xlink:href="#radiator" x="72" y="120" /> 
 
-        <text x="140" y="155" font-size="5">Kitchen</text>
-        <use xlink:href="#radiator" x="140" y="155" /> 
+        <text x="140" y="120" font-size="5">KITCHEN</text>
+        <use xlink:href="#radiator" x="140" y="120" /> 
 
     </svg>
     <script src="secrets.js"></script>
@@ -171,5 +176,4 @@ function onConnect() {
 
     </script>
 </body>
-
 </html>
